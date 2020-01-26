@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/nodemon ./bin/www -w assignment2.js -w server",
+    "start": "./node_modules/.bin/nodemon ./bin/www -w server.js -w server",
     "test": "mocha 'test/*.js' --recursive"
   },
   "keywords": [],
