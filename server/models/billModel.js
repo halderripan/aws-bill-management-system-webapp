@@ -21,10 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     bill_date: {
-      type: DataTypes.DATE
+      type: DataTypes.DATEONLY
     },
     due_date: {
-      type: DataTypes.DATE
+      type: DataTypes.DATEONLY
     },
     amount_due: {
       type: DataTypes.DOUBLE,
@@ -32,6 +32,12 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         min: 0.01
       }
+    },
+    categories: {
+      type: DataTypes.ARRAY(DataTypes.STRING)
+    },
+    paymentStatus: {
+      type: DataTypes.ENUM("paid", "due", "past_due", "no_payment_required")
     }
   });
   return Bill;

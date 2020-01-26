@@ -19,6 +19,7 @@
     "pg": "^6.2.4",
     "pg-hstore": "^2.3.2",
     "sequelize": "^4.1.0",
+    "sequelize-noupdate-attributes": "^1.0.0",
     "supertest-chai": "0.0.8"
   },
   "devDependencies": {

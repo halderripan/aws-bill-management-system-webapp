@@ -6,7 +6,9 @@
  */
 
 const users = require('./usersController');
+const bills = require('./billsController');
 
 module.exports = {
-  users
+  users,
+  bills
 };

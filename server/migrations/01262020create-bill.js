@@ -15,10 +15,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       bill_date: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
       },
       due_date: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
       },
       amount_due: {
         type: Sequelize.DOUBLE,
@@ -27,6 +27,12 @@ module.exports = {
           min: 0.01
         }
       },
+      categories: {
+        type: Sequelize.ARRAY(Sequelize.STRING)
+      },
+      paymentStatus: {
+        type: Sequelize.ENUM("paid", "due", "past_due", "no_payment_required")
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false
@@ -34,7 +40,7 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-      },
+      }
     }),
   down: (queryInterface /* , Sequelize */) => queryInterface.dropTable('Bills'),
 };

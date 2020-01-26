@@ -5,7 +5,7 @@
  * @since 01/20/2020
  */
 
- const User = require('../models/indexModel').User;
+const User = require('../models/indexModel').User;
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
