@@ -10,6 +10,7 @@ const User = require('../models/indexModel').User;
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
+const Promise = require('promise');
 
 const { validationResult } = require('express-validator');
 
@@ -25,63 +26,26 @@ module.exports = {
             authenticationStatus(res);
             return;
         }
-
-        let authentication = req.headers.authorization.replace(/^Basic/, '');
-        authentication = (new Buffer(authentication, 'base64')).toString('utf8');
-        const loginInfo = authentication.split(':');
-        const userName = loginInfo[0];
-        const passwordFromToken = loginInfo[1];
-
-        console.log(`UserName: ${userName} :::::: Password : ${passwordFromToken}`);
-        return User
-            .findAll({
-                limit: 1,
-                where: {
-                    email_address: userName
-                },
-            })
-            .then((user) => {
-                if (user.length == 0) {
-                    return res.status(404).send({
-                        message: 'User Not Found! Invalid Username!',
-                    });
-                }
-
-                console.log(`User ${user[0]}`);
-                console.log(`User Name ${user[0].first_name}`);
-                console.log(`User ID ${user[0].id}`);
-                bcrypt.compare(passwordFromToken, user[0].dataValues.password, function (err, res2) {
-                    if (err) {
-                        return res.status(400).send({
-                            message: 'Error occured while comparing passwords.'
-                        })
-                    }
-                    if (res2) {
-                        return Bill
-                            .create({
-                                owner_id: user[0].id,
-                                vendor: req.body.vendor,
-                                bill_date: req.body.bill_date,
-                                due_date: req.body.due_date,
-                                amount_due: req.body.amount_due,
-                                categories: req.body.categories,
-                                paymentStatus: req.body.paymentStatus
-                            })
-                            .then((bill) => {
-                                bill.dataValues.created_ts = bill.dataValues.createdAt;
-                                bill.dataValues.updated_ts = bill.dataValues.updatedAt;
-                                delete bill.dataValues.createdAt;
-                                delete bill.dataValues.updatedAt;
-                                res.status(201).send(bill)
-                            })
-                            .catch((error) => res.status(400).send(error));
-
-                    } else {
-                        return res.status(401).json({ success: false, message: 'Unauthorized! Wrong Password!' });
-                    }
-                });
-            })
-            .catch((error) => res.status(400).send(error));
+        authorizeAnUser(req, res).then(function (user) {
+            return Bill
+                .create({
+                    owner_id: user.id,
+                    vendor: req.body.vendor,
+                    bill_date: req.body.bill_date,
+                    due_date: req.body.due_date,
+                    amount_due: req.body.amount_due,
+                    categories: req.body.categories,
+                    paymentStatus: req.body.paymentStatus
+                })
+                .then((bill) => {
+                    bill.dataValues.created_ts = bill.dataValues.createdAt;
+                    bill.dataValues.updated_ts = bill.dataValues.updatedAt;
+                    delete bill.dataValues.createdAt;
+                    delete bill.dataValues.updatedAt;
+                    res.status(201).send(bill)
+                })
+                .catch((error) => res.status(400).send(error));
+        });
     }
 }
 
@@ -90,40 +54,48 @@ function authenticationStatus(resp) {
     resp.end('Basic Authorization is needed! Please provide Username and Password!');
 };
 
-function authorizeAnUser(req, res) {
-    let authentication = req.headers.authorization.replace(/^Basic/, '');
-    authentication = (new Buffer(authentication, 'base64')).toString('utf8');
-    const loginInfo = authentication.split(':');
-    const userName = loginInfo[0];
-    const passwordFromToken = loginInfo[1];
+const authorizeAnUser = function (req, res) {
+    return new Promise(function (resolve, reject) {
+        let authentication = req.headers.authorization.replace(/^Basic/, '');
+        authentication = (new Buffer(authentication, 'base64')).toString('utf8');
+        const loginInfo = authentication.split(':');
+        const userName = loginInfo[0];
+        const passwordFromToken = loginInfo[1];
 
-    console.log(`UserName: ${userName} :::::: Password : ${passwordFromToken}`);
-    return User
-        .findAll({
-            limit: 1,
-            where: {
-                email_address: userName
-            },
-        })
-        .then((user) => {
-            if (user.length == 0) {
-                return res.status(404).send({
-                    message: 'User Not Found! Invalid Username!',
+        User
+            .findAll({
+                limit: 1,
+                where: {
+                    email_address: userName
+                },
+            })
+            .then((user) => {
+                if (user.length == 0) {
+                    reject(Error("Invalid Username!"));
+                    return res.status(404).send({
+                        message: 'User Not Found! Invalid Username!',
+                    });
+                }
+                bcrypt.compare(passwordFromToken, user[0].dataValues.password, function (err, res2) {
+                    if (err) {
+                        reject(Error("Passwords Error!"));
+                        return res.status(400).send({
+                            message: 'Error occured while comparing passwords.'
+                        })
+                    }
+                    if (res2) {
+                        resolve(user[0]);
+                    } else {
+                        reject(Error(`Wrong Passwords!`));
+                        return res.status(401).json({ success: false, message: 'Unauthorized! Wrong Password!' });
+                    }
                 });
-            }
-            bcrypt.compare(passwordFromToken, user[0].dataValues.password, function (err, res2) {
-                if (err) {
-                    return res.status(400).send({
-                        message: 'Error occured while comparing passwords.'
-                    })
-                }
-                if (res2) {
-                    return user;
-
-                } else {
-                    return res.status(401).json({ success: false, message: 'Unauthorized! Wrong Password!' });
-                }
+            })
+            .catch((error) => {
+                reject(error);
+                return res.status(400).send({
+                    message: 'Error occured while finding an user!'
+                });
             });
-        })
-        .catch((error) => res.status(400).send(error));
+    });
 }
