@@ -1,6 +1,6 @@
 version: 2.1 # use CircleCI 2.1
 jobs: # a collection of steps
-  build: # runs not using Workflows must have a `build` job as entry point
+  pr_check: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/webapp # directory where steps will run
     docker: # run the steps with Docker
       - image: circleci/node:10.16.3 # ...with this image as the primary container; this is where all `steps` will run
@@ -20,9 +20,6 @@ jobs: # a collection of steps
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
-  pr_check:
-    steps: # a collection of executable commands
-      - checkout # special step to check out source code to working directory
       - run: # run tests
           name: test
           command: npm test
@@ -35,8 +32,4 @@ workflows:
   version: 2
   pr-check-workflow:
     jobs:
-    - build
-    # - pr_check
-  build-deploy-workflow:
-    jobs:
-    - build
+    - pr_check
