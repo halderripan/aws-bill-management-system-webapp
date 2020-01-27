@@ -1,6 +1,10 @@
 {
   "development": {
+<<<<<<< HEAD
     "username": "postgres",
+=======
+    "username": "me",
+>>>>>>> parent of 6401313... circleCi test
     "password": "P039742p",
     "database": "cloudassignment",
     "host": "localhost",
