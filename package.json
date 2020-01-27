@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/nodemon ./bin/www -w assignment2.js -w server",
-    "test": "mocha 'test/*.js' --recursive"
+    "start": "./node_modules/.bin/nodemon ./bin/www -w server.js -w server",
+    "test": "mocha 'test/*.js' --exit"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +18,9 @@
     "morgan": "^1.7.0",
     "pg": "^6.2.4",
     "pg-hstore": "^2.3.2",
+    "promise": "^8.0.3",
     "sequelize": "^4.1.0",
+    "sequelize-noupdate-attributes": "^1.0.0",
     "supertest-chai": "0.0.8"
   },
   "devDependencies": {

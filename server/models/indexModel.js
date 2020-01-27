@@ -14,6 +14,7 @@ const config = require(`${__dirname}/../config/config.json`)[env];
 const db = {};
 
 let sequelize;
+sequelize; 
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable]);
 } else {
