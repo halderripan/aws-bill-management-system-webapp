@@ -17,24 +17,24 @@ const should = chai.should();
 chai.use(supertestChai.httpAsserts);
 
 describe("POST /v1/user", function () {
-    // it("should successfully create a new user object", function (done) {
-    //     var payload = {
-    //         email_address: "testDemo@abc.abc",
-    //         first_name: "Lord",
-    //         last_name: "Ripan",
-    //         password: "ASfadf@12345"
-    //     };
-    //     var server = app.listen();
-    //     request(server)
-    //         .post("/v1/user")
-    //         .send(payload)
-    //         .end(function (err, res) {
-    //             if (err) done(err);
-    //             res.should.have.status(201);
-    //             res.body.should.be.a("object");
-    //             done();
-    //         });
-    // });
+    it("should successfully create a new user object", function (done) {
+        var payload = {
+            email_address: "unitTest@husky.neu.edu",
+            first_name: "Lord",
+            last_name: "Ripan",
+            password: "ASfadf@12345"
+        };
+        var server = app.listen();
+        request(server)
+            .post("/v1/user")
+            .send(payload)
+            .end(function (err, res) {
+                if (err) done(err);
+                res.should.have.status(201);
+                res.body.should.be.a("object");
+                done();
+            });
+    });
 
     it("should return and error if email address is not present while creating an user", function (done) {
         var payload = {
@@ -62,7 +62,7 @@ describe("GET /v1/user/self", function () {
         var server = app.listen();
         request(server)
             .get("/v1/user/self")
-            .auth('testDemo@abc.abc', 'ASfadf@12345')
+            .auth('unitTest@husky.neu.edu', 'ASfadf@12345')
             .end(function (err, res) {
                 if (err) done(err);
                 res.should.have.status(200);
@@ -75,7 +75,7 @@ describe("GET /v1/user/self", function () {
         var server = app.listen();
         request(server)
             .get("/v1/user/self")
-            .auth('testDemo@abc.abc', 'wrongPassword')
+            .auth('unitTest@husky.neu.edu', 'wrongPassword')
             .end(function (err, res) {
                 if (err) done(err);
                 res.should.have.status(401);
@@ -90,18 +90,18 @@ describe("PUT /v1/user/self", function () {
     it("should successfully update an user object", function (done) {
         var server = app.listen();
         var payload = {
-            email_address: "testDemo@abc.abc",
-            first_name: "Lord",
-            last_name: "Ripan",
+            email_address: "unitTest@husky.neu.edu",
+            first_name: "Ripan",
+            last_name: "Halder",
             password: "ASfadf@12345"
         };
         request(server)
             .put("/v1/user/self")
-            .auth('testDemo@abc.abc', 'ASfadf@12345')
+            .auth('unitTest@husky.neu.edu', 'ASfadf@12345')
             .send(payload)
             .end(function (err, res) {
                 if (err) done(err);
-                res.should.have.status(200);
+                res.should.have.status(204);
                 res.body.should.be.a("object");
                 done();
             });
