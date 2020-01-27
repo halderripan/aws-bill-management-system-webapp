@@ -15,7 +15,7 @@ module.exports = (app) => {
   // Bill Routes
   app.get('/v1/bill/:id', billController.getBillByID);
   app.get('/v1/bills', billController.getAllBills);
-  // app.put('/v1/user/self', billController.updateUser);
+  app.put('/v1/bill/:id', billController.updateBillByID);
   app.post('/v1/bill', billController.createBill);
   app.delete('/v1/bill/:id' , billController.deleteBillByID);
 };

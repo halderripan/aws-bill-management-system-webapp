@@ -45,7 +45,7 @@ module.exports = {
                     res.status(201).send(bill)
                 })
                 .catch((error) => res.status(400).send({
-                    message: "New Bill Not Created!"
+                    message: "Something Unexpected Happened while creating the bill!"
                 }));
         });
     },
@@ -76,7 +76,7 @@ module.exports = {
                     }
                     else if (bills[0].dataValues.owner_id != user.dataValues.id) {
                         return res.status(401).send({
-                            message: "User Unauthorized to view this Bill!"
+                            message: "User not authorized to view this Bill!"
                         })
                     }
                     bills[0].dataValues.created_ts = bills[0].dataValues.createdAt;
@@ -86,7 +86,7 @@ module.exports = {
                     return res.status(200).send(bills[0])
                 })
                 .catch((error) => res.status(400).send({
-                    message: "Bill Not Found!"
+                    message: "Something Unexpected Happened while finding bill!"
                 }));
         });
     },
@@ -123,7 +123,7 @@ module.exports = {
                     return res.status(200).send(bills);
                 })
                 .catch((error) => res.status(400).send({
-                    message: "No Bills Found!"
+                    message: "Something Unexpected Happened while finding bill!"
                 }));
         });
     },
@@ -154,7 +154,7 @@ module.exports = {
                     }
                     else if (bills[0].dataValues.owner_id != user.dataValues.id) {
                         return res.status(401).send({
-                            message: "User Unauthorized to delete this Bill!"
+                            message: "User not authorized to delete this Bill!"
                         })
                     }
                     return Bill
@@ -163,7 +163,7 @@ module.exports = {
                                 id: req.params.id
                             }
                         })
-                        .then((rowDeleted) => { 
+                        .then((rowDeleted) => {
                             if (rowDeleted === 1) {
                                 res.status(204).send('Deleted successfully');
                             }
@@ -174,7 +174,61 @@ module.exports = {
                         }))
                 })
                 .catch((error) => res.status(400).send({
-                    message: "Bill Not Found!"
+                    message: "Something Unexpected Happened while finding bill!"
+                }));
+        });
+    },
+
+    updateBillByID(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        if (!req.headers.authorization) {
+            authenticationStatus(res);
+            return;
+        }
+        authorizeAnUser(req, res).then(function (user) {
+            return Bill
+                .findAll({
+                    where: {
+                        id: req.params.id
+                    },
+                    limit: 1
+                })
+                .then((bills) => {
+                    if (bills.length == 0) {
+                        return res.status(404).send({
+                            message: "Bill Not Found!"
+                        })
+                    }
+                    else if (bills[0].dataValues.owner_id != user.dataValues.id) {
+                        return res.status(401).send({
+                            message: "User not authorized to update this Bill!"
+                        })
+                    }
+
+                    console.log(`Ripan`);
+                    return Bill
+                        .update({
+                            vendor: req.body.vendor,
+                            bill_date: req.body.bill_date,
+                            due_date: req.body.due_date,
+                            amount_due: req.body.amount_due,
+                            categories: req.body.categories,
+                            paymentStatus: req.body.paymentStatus
+                        }, {
+                            
+                            where: {
+                                id: req.params.id
+                            }
+                        })
+                        .then((user) => res.status(204).send("Updated Successfully!"))
+                        .catch((error) => res.status(400).send("Something Unexpected Happened while updating!"));
+                })
+                .catch((error) => res.status(400).send({
+                    message: "Something Unexpected Happened while finding bill!"
                 }));
         });
     }

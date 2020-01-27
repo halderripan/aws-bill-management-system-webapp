@@ -128,7 +128,7 @@ module.exports = {
                     {
                       where: { email_address: userName }
                     })
-                  .then((user) => res.status(200).send("Updated Successfully!"))
+                  .then((user) => res.status(204).send("Updated Successfully!"))
                   .catch((error) => res.status(400).send(error));
               }
             })
