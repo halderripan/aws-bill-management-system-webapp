@@ -44,7 +44,50 @@ module.exports = {
                     delete bill.dataValues.updatedAt;
                     res.status(201).send(bill)
                 })
-                .catch((error) => res.status(400).send(error));
+                .catch((error) => res.status(400).send({
+                    message: "New Bill Not Created!"
+                }));
+        });
+    },
+
+    getBillByID(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        if (!req.headers.authorization) {
+            authenticationStatus(res);
+            return;
+        }
+        authorizeAnUser(req, res).then(function (user) {
+            return Bill
+                .findAll({
+                    where:{
+                        id : req.params.id
+                    },
+                    limit: 1
+                })
+                .then((bills) => {
+                    if(bills.length == 0){
+                        return res.status(404).send({
+                            message: "Bill Not Found!"
+                        })
+                    }
+                    else if(bills[0].dataValues.owner_id != user.dataValues.id){
+                        return res.status(401).send({
+                            message: "User Unauthorized to view this Bill!"
+                        })
+                    }
+                    bills[0].dataValues.created_ts = bills[0].dataValues.createdAt;
+                    bills[0].dataValues.updated_ts = bills[0].dataValues.updatedAt;
+                    delete bills[0].dataValues.createdAt;
+                    delete bills[0].dataValues.updatedAt;
+                    return res.status(200).send(bills[0])
+                })
+                .catch((error) => res.status(400).send({
+                    message: "Bill Not Found!"
+                }));
         });
     }
 }

@@ -13,7 +13,7 @@ module.exports = (app) => {
   app.post('/v1/user', createUserValidator, userController.createUser);
 
   // Bill Routes
-  // app.get('/v1/user/self', billController.getUser);
+  app.get('/v1/bill/:id', billController.getBillByID);
   // app.put('/v1/user/self', billController.updateUser);
   app.post('/v1/bill', billController.createBill);
 };
