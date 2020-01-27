@@ -17,4 +17,5 @@ module.exports = (app) => {
   app.get('/v1/bills', billController.getAllBills);
   // app.put('/v1/user/self', billController.updateUser);
   app.post('/v1/bill', billController.createBill);
+  app.delete('/v1/bill/:id' , billController.deleteBillByID);
 };

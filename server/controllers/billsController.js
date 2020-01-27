@@ -63,18 +63,18 @@ module.exports = {
         authorizeAnUser(req, res).then(function (user) {
             return Bill
                 .findAll({
-                    where:{
-                        id : req.params.id
+                    where: {
+                        id: req.params.id
                     },
                     limit: 1
                 })
                 .then((bills) => {
-                    if(bills.length == 0){
+                    if (bills.length == 0) {
                         return res.status(404).send({
                             message: "Bill Not Found!"
                         })
                     }
-                    else if(bills[0].dataValues.owner_id != user.dataValues.id){
+                    else if (bills[0].dataValues.owner_id != user.dataValues.id) {
                         return res.status(401).send({
                             message: "User Unauthorized to view this Bill!"
                         })
@@ -104,12 +104,12 @@ module.exports = {
         authorizeAnUser(req, res).then(function (user) {
             return Bill
                 .findAll({
-                    where:{
-                        owner_id : user.dataValues.id
+                    where: {
+                        owner_id: user.dataValues.id
                     }
                 })
                 .then((bills) => {
-                    if(bills.length == 0){
+                    if (bills.length == 0) {
                         return res.status(404).send({
                             message: "No Bills Found!"
                         })
@@ -124,6 +124,57 @@ module.exports = {
                 })
                 .catch((error) => res.status(400).send({
                     message: "No Bills Found!"
+                }));
+        });
+    },
+
+    deleteBillByID(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        if (!req.headers.authorization) {
+            authenticationStatus(res);
+            return;
+        }
+        authorizeAnUser(req, res).then(function (user) {
+            return Bill
+                .findAll({
+                    where: {
+                        id: req.params.id
+                    },
+                    limit: 1
+                })
+                .then((bills) => {
+                    if (bills.length == 0) {
+                        return res.status(404).send({
+                            message: "Bill Not Found!"
+                        })
+                    }
+                    else if (bills[0].dataValues.owner_id != user.dataValues.id) {
+                        return res.status(401).send({
+                            message: "User Unauthorized to delete this Bill!"
+                        })
+                    }
+                    return Bill
+                        .destroy({
+                            where: {
+                                id: req.params.id
+                            }
+                        })
+                        .then((rowDeleted) => { 
+                            if (rowDeleted === 1) {
+                                res.status(204).send('Deleted successfully');
+                            }
+                        })
+                        .catch((e) => res.status(400).send({
+                            message: "Some Error Occured While Deleting!",
+                            error: e
+                        }))
+                })
+                .catch((error) => res.status(400).send({
+                    message: "Bill Not Found!"
                 }));
         });
     }
