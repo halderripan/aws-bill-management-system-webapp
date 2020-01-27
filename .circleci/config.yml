@@ -21,6 +21,7 @@ jobs: # a collection of steps
           name: install-npm-wee
           command: npm install
 
+          # sequelize to migrate dbs but it  reads from my code postgres config
       - run: sudo npm install -g sequelize-cli
 
       - save_cache: # special step to save the dependency cache
@@ -28,8 +29,15 @@ jobs: # a collection of steps
           paths:
             - ./node_modules
       - run:
+          name: Initialize DB
+          command: |
+            psql -U postgres -h localhost
+            CREATE DATABASE cloudassignment;
+            
+      - run:
           name: Database Setup
           command: sequelize db:migrate
+          
 
       - run: # run tests
           name: test
