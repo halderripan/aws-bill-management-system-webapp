@@ -24,17 +24,11 @@ jobs: # a collection of steps
 
           # sequelize to migrate dbs but it  reads from my code postgres config
       - run: sudo npm install -g sequelize-cli
-      - run: sudo apt install -y postgresql-client || true
 
       - save_cache: # special step to save the dependency cache
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
-      # - run:
-      #     name: Connect DB
-      #     command: psql -U postgres -h localhost
-      # - run: CREATE DATABASE cloudassignment;
-      # - run: sleep 1000;
 
       - run:
           name: Database Setup
