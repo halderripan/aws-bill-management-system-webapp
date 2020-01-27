@@ -30,10 +30,12 @@ jobs: # a collection of steps
           paths:
             - ./node_modules
       - run:
-          name: Initialize DB
-          command: |
-            psql -U postgres -h localhost
-            CREATE DATABASE cloudassignment;
+          name: Connect DB
+          command: psql -U postgres -h localhost
+
+      - run: CREATE DATABASE cloudassignment;
+      - run: \q 
+          
 
       - run:
           name: Database Setup
