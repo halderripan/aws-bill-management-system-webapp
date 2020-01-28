@@ -55,6 +55,3 @@ workflows:
     - pr_check:
         requires:
           - build
-        filters:
-          branches:
-            only: master
