@@ -7,6 +7,8 @@
 
 const Bill = require('../models/indexModel').Bill;
 const User = require('../models/indexModel').User;
+const moment = require('moment');
+moment.suppressDeprecationWarnings = true;
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
@@ -50,9 +52,7 @@ module.exports = {
                             message: "Invalid Date!"
                         });
                     }
-                    res.status(400).send({
-                        message: "Something Unexpected Happened while creating the bill!"
-                    });
+                    res.status(400).send(error);
                 });
         });
     },
@@ -230,7 +230,6 @@ module.exports = {
                         })
                     }
 
-                    console.log(`Ripan`);
                     return Bill
                         .update({
                             vendor: req.body.vendor,
@@ -245,7 +244,26 @@ module.exports = {
                                 id: req.params.id
                             }
                         })
-                        .then((user) => res.status(204).send("Updated Successfully!"))
+                        .then((resp) => {
+                            return Bill
+                                .findAll({
+                                    where: {
+                                        id: req.params.id
+                                    }
+                                })
+                                .then((bills) => {
+                                    bills.forEach(bill => {
+                                        bill.dataValues.created_ts = bill.dataValues.createdAt;
+                                        bill.dataValues.updated_ts = bill.dataValues.updatedAt;
+                                        delete bill.dataValues.createdAt;
+                                        delete bill.dataValues.updatedAt;
+                                    });
+                                    return res.status(200).send(bills[0]);
+                                })
+                                .catch((error) => res.status(400).send({
+                                    message: "Bill not found!"
+                                }));
+                        })
                         .catch((error) => {
                             if (error.errors[0].value == "Invalid date") {
                                 res.status(400).send({
