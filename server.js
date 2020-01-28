@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 require('./server/routes')(app);
 app.get('*', (req, res) => res.status(200).send({
-  message: 'Welcome to Assignment 2 of - CSYE 6225 - Network Structure & Cloud Computing (Spring 2020)',
+  message: 'Invalid Route! Welcome to Assignments of - CSYE 6225 - Network Structure & Cloud Computing (Spring 2020)',
 }));
 
 module.exports = app;

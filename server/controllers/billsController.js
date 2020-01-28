@@ -44,9 +44,16 @@ module.exports = {
                     delete bill.dataValues.updatedAt;
                     res.status(201).send(bill)
                 })
-                .catch((error) => res.status(400).send({
-                    message: "Something Unexpected Happened while creating the bill!"
-                }));
+                .catch((error) => {
+                    if (error.errors[0].value == "Invalid date") {
+                        res.status(400).send({
+                            message: "Invalid Date!"
+                        });
+                    }
+                    res.status(400).send({
+                        message: "Something Unexpected Happened while creating the bill!"
+                    });
+                });
         });
     },
 
@@ -85,9 +92,16 @@ module.exports = {
                     delete bills[0].dataValues.updatedAt;
                     return res.status(200).send(bills[0])
                 })
-                .catch((error) => res.status(400).send({
-                    message: "Something Unexpected Happened while finding bill!"
-                }));
+                .catch((error) => {
+                    if (error.parent.file == "uuid.c") {
+                        res.status(400).send({
+                            message: "Invalid Bill Id type: UUID/V4 Passed!"
+                        })
+                    }
+                    res.status(400).send({
+                        message: "Bill Not Found!"
+                    })
+                });
         });
     },
 
@@ -123,7 +137,7 @@ module.exports = {
                     return res.status(200).send(bills);
                 })
                 .catch((error) => res.status(400).send({
-                    message: "Something Unexpected Happened while finding bill!"
+                    message: "Bill not found!"
                 }));
         });
     },
@@ -173,9 +187,16 @@ module.exports = {
                             error: e
                         }))
                 })
-                .catch((error) => res.status(400).send({
-                    message: "Something Unexpected Happened while finding bill!"
-                }));
+                .catch((error) => {
+                    if (error.parent.file == "uuid.c") {
+                        res.status(400).send({
+                            message: "Invalid Bill Id type: UUID/V4 Passed!"
+                        })
+                    }
+                    res.status(400).send({
+                        message: "Bill Not Found!"
+                    })
+                });
         });
     },
 
@@ -219,17 +240,31 @@ module.exports = {
                             categories: req.body.categories,
                             paymentStatus: req.body.paymentStatus
                         }, {
-                            
+
                             where: {
                                 id: req.params.id
                             }
                         })
                         .then((user) => res.status(204).send("Updated Successfully!"))
-                        .catch((error) => res.status(400).send("Something Unexpected Happened while updating!"));
+                        .catch((error) => {
+                            if (error.errors[0].value == "Invalid date") {
+                                res.status(400).send({
+                                    message: "Invalid Date!"
+                                });
+                            }
+                            res.status(400).send("Something Unexpected Happened while updating!")
+                        });
                 })
-                .catch((error) => res.status(400).send({
-                    message: "Something Unexpected Happened while finding bill!"
-                }));
+                .catch((error) => {
+                    if (error.parent.file == "uuid.c") {
+                        res.status(400).send({
+                            message: "Invalid Bill Id type: UUID/V4 Passed!"
+                        })
+                    }
+                    res.status(400).send({
+                        message: "Bill Not Found!"
+                    })
+                });
         });
     }
 }

@@ -5,7 +5,7 @@
  * @since 01/20/2020
  */
 
-const {check} = require('express-validator');
+const { check, body } = require('express-validator');
 const REQUEST_PARAM = require('../constants/constants').REQUEST_PARAM;
 
 /**
@@ -41,24 +41,30 @@ const createBillValidator = [
 
     check(REQUEST_PARAM.CREATE_BILL.DUE_DATE)
     .exists(),
+
     check(REQUEST_PARAM.CREATE_BILL.AMOUNT_DUE)
-    .exists(),
+    .exists()
+    .isNumeric(),
+    
     check(REQUEST_PARAM.CREATE_BILL.CATEGORIES)
-    .exists(),
+    .exists()
+    .isArray(),
+    
     check(REQUEST_PARAM.CREATE_BILL.PAYMENTSTATUS)
     .exists(),
     
     check(REQUEST_PARAM.CREATE_BILL.VENDOR)
     .exists()
-    .isLength({
-        min: 1,
-        max: 100
-    }),
-
-    
 
 ]
 
+const paymentStatusValidator = body('paymentStatus').custom((value, { req }) => {
+    if (value !== "paid" && value !== "due" && value !== "past_due" && value !== "no_payment_required")  {
+      throw new Error(`Payment Status must be 'paid', 'due', 'past_due' or 'no_payment_required'`);
+    }
+    return true;
+  })
+
 module.exports = {
-    createBillValidator, createUserValidator
+    createBillValidator, createUserValidator, paymentStatusValidator
 };
