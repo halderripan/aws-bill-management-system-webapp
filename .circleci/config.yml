@@ -65,11 +65,5 @@ workflows:
   version: 2
   pr-check-workflow:
     jobs:
-    - build:
-        filters:
-            branches:
-              only: master
-    - pr_check:
-        filters:
-            branches:
-              only: master
+    - build
+    - pr_check
