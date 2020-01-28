@@ -34,7 +34,7 @@ jobs: # a collection of steps
     steps: # a collection of executable commands
       - checkout # special step to check out source code to working directory
 
-          # sequelize to migrate dbs but it  reads from my code postgres config
+      - run: mkdir ~/junit
       - run:
           name: update-npm
           command: 'sudo npm install -g npm@latest'
@@ -56,9 +56,14 @@ jobs: # a collection of steps
           
       - run: # run tests
           name: test
-          command: npm test
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: temp/test-results.xml
+          command: npm test circleci
+          environment:
+            MOCHA_FILE: ~/junit/test-results.xml
+          when: always
+      - store_test_results:
+          path: ~/junit
+      - store_artifacts:
+          path: ~/junit
   
 
 workflows:
