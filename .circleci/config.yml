@@ -69,9 +69,13 @@ workflows:
     - pr_check:
         requires:
           - build
+        filters:
+          branches:
+            only: master
   build_deploy-workflow:
     jobs:
-    - build
+    - build:
+        type: approval
     - pr_check:
         requires:
           - build
