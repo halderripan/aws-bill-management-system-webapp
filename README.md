@@ -208,7 +208,7 @@ $ npm build
 ```
   
 
-## Maintainers
+## Developers
 
-Current maintainers:
+Current developers:
 * [Ripan Halder](https://github.com/halderripan)
