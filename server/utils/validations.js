@@ -35,6 +35,30 @@ const createUserValidator = [
     })
 ]
 
+const createBillValidator = [
+    check(REQUEST_PARAM.CREATE_BILL.BILL_DATE)
+    .exists(),
+
+    check(REQUEST_PARAM.CREATE_BILL.DUE_DATE)
+    .exists(),
+    check(REQUEST_PARAM.CREATE_BILL.AMOUNT_DUE)
+    .exists(),
+    check(REQUEST_PARAM.CREATE_BILL.CATEGORIES)
+    .exists(),
+    check(REQUEST_PARAM.CREATE_BILL.PAYMENTSTATUS)
+    .exists(),
+    
+    check(REQUEST_PARAM.CREATE_BILL.VENDOR)
+    .exists()
+    .isLength({
+        min: 1,
+        max: 100
+    }),
+
+    
+
+]
+
 module.exports = {
-    createUserValidator
+    createBillValidator, createUserValidator
 };

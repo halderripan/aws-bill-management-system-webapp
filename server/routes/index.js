@@ -1,6 +1,7 @@
 const userController = require('../controllers/indexController').users;
 const billController = require('../controllers/indexController').bills;
 const createUserValidator = require('../utils/validations').createUserValidator;
+const createBillValidator = require('../utils/validations').createBillValidator;
 
 module.exports = (app) => {
   app.get('/v1', (req, res) => res.status(200).send({
@@ -15,7 +16,7 @@ module.exports = (app) => {
   // Bill Routes
   app.get('/v1/bill/:id', billController.getBillByID);
   app.get('/v1/bills', billController.getAllBills);
-  app.put('/v1/bill/:id', billController.updateBillByID);
-  app.post('/v1/bill', billController.createBill);
-  app.delete('/v1/bill/:id' , billController.deleteBillByID);
+  app.put('/v1/bill/:id',createBillValidator, billController.updateBillByID);
+  app.post('/v1/bill',createBillValidator, billController.createBill);
+  app.delete('/v1/bill/:id' ,createBillValidator, billController.deleteBillByID);
 };
