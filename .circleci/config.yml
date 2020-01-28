@@ -18,9 +18,6 @@ jobs: # a collection of steps
           name: install-npm-wee
           command: npm install
 
-          # sequelize to migrate dbs but it  reads from my code postgres config
-      - run: sudo npm install -g sequelize-cli
-
       - save_cache: # special step to save the dependency cache
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
@@ -36,6 +33,9 @@ jobs: # a collection of steps
           POSTGRES_PASSWORD: P039742p
     steps: # a collection of executable commands
       - checkout # special step to check out source code to working directory
+
+          # sequelize to migrate dbs but it  reads from my code postgres config
+      - run: sudo npm install -g sequelize-cli
       - run:
           name: Database Setup
           command: sequelize db:migrate
