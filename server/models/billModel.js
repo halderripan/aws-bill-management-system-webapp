@@ -21,10 +21,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     bill_date: {
-      type: DataTypes.DATEONLY
+      type: DataTypes.DATEONLY,
+      validate: {
+        isDate: true
+      }
     },
     due_date: {
-      type: DataTypes.DATEONLY
+      type: DataTypes.DATEONLY,
+      validate: {
+        isDate: true
+      }
     },
     amount_due: {
       type: DataTypes.DOUBLE,
