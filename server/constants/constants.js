@@ -9,6 +9,15 @@ const REQUEST_PARAM = {
         FIRSTNAME: 'first_name',
         LASTNAME: 'last_name',
         EMAIL_ADDRESS: 'email_address'
+    },
+    CREATE_BILL: {
+        OWNER_ID: 'owner_id',
+        BILL_DATE: 'bill_date',
+        DUE_DATE: 'due_date',
+        VENDOR: 'vendor',
+        AMOUNT_DUE:'amount_due',
+        PAYMENTSTATUS:'paymentStatus',
+        CATEGORIES:'categories',
     }
 }
 
