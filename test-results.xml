@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.0430" tests="6" failures="1">
+  <testsuite name="Root Suite" timestamp="2020-01-28T10:06:37" tests="0" time="0.0000" failures="0">
+  </testsuite>
+  <testsuite name="POST /v1/user" timestamp="2020-01-28T10:06:37" tests="2" file="/Users/ripanhalder/Documents/Cloud/webapp/test/testRoutes.js" time="0.0050" failures="1">
+    <testcase name="POST /v1/user should successfully create a new user object" time="0.0000" classname="should successfully create a new user object">
+      <failure message="expected { Object (req, res, ...) } to have status code 201 but got 400" type="AssertionError"><![CDATA[AssertionError: expected { Object (req, res, ...) } to have status code 201 but got 400
+    at /Users/ripanhalder/Documents/Cloud/webapp/test/testRoutes.js:33:33
+    at Request.callback (node_modules/superagent/lib/node/index.js:569:30)
+    at Request.<anonymous> (node_modules/superagent/lib/node/index.js:140:10)
+    at /Users/ripanhalder/Documents/Cloud/webapp/node_modules/superagent/lib/node/index.js:697:16
+    at next (node_modules/superagent/lib/node/index.js:612:23)
+    at /Users/ripanhalder/Documents/Cloud/webapp/node_modules/superagent/lib/node/middleware/bodyParser.js:65:26
+    at Response.<anonymous> (node_modules/superagent/lib/node/parsers/json.js:10:7)
+    at endReadableNT (_stream_readable.js:1125:12)
+    at process._tickCallback (internal/process/next_tick.js:63:19)]]></failure>
+    </testcase>
+    <testcase name="POST /v1/user should return and error if email address is not present while creating an user" time="0.0050" classname="should return and error if email address is not present while creating an user">
+    </testcase>
+  </testsuite>
+  <testsuite name="GET /v1/user/self" timestamp="2020-01-28T10:06:37" tests="2" file="/Users/ripanhalder/Documents/Cloud/webapp/test/testRoutes.js" time="0.0140" failures="0">
+    <testcase name="GET /v1/user/self should successfully return an user object" time="0.0090" classname="should successfully return an user object">
+    </testcase>
+    <testcase name="GET /v1/user/self should return unauthorized" time="0.0050" classname="should return unauthorized">
+    </testcase>
+  </testsuite>
+  <testsuite name="PUT /v1/user/self" timestamp="2020-01-28T10:06:37" tests="2" file="/Users/ripanhalder/Documents/Cloud/webapp/test/testRoutes.js" time="0.0240" failures="0">
+    <testcase name="PUT /v1/user/self should successfully update an user object" time="0.0210" classname="should successfully update an user object">
+    </testcase>
+    <testcase name="PUT /v1/user/self should return a user not found" time="0.0030" classname="should return a user not found">
+    </testcase>
+  </testsuite>
+</testsuites>
