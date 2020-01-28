@@ -7,6 +7,8 @@
 
 const Bill = require('../models/indexModel').Bill;
 const User = require('../models/indexModel').User;
+const moment = require('moment');
+moment.suppressDeprecationWarnings = true;
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
@@ -50,9 +52,7 @@ module.exports = {
                             message: "Invalid Date!"
                         });
                     }
-                    res.status(400).send({
-                        message: "Something Unexpected Happened while creating the bill!"
-                    });
+                    res.status(400).send(error);
                 });
         });
     },
