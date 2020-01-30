@@ -180,7 +180,7 @@ $ npm install -g mocha
 ```
 The [package.json](https://github.com/halderr-spring2020/webapp/blob/master/package.json) file includes the following script for mocha to do `npm test` for unit and system integration testing.
 ```json
-"test": "mocha 'test/*.js' --exit"
+"test": "mocha --exit"
 ```
 `--exit` means the mocha test server stops running after the testing ends.
 
