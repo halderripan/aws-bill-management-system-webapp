@@ -70,7 +70,10 @@ workflows:
   version: 2
   pr-check-workflow:
     jobs:
-    - build
-    - pr_check:
-        requires:
-          - build
+    - pr_check
+  build-deploy-workflow:
+    jobs:
+    - build:
+        filters:
+          branches:
+            only: master
