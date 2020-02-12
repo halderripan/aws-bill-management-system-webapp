@@ -44,6 +44,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     paymentStatus: {
       type: DataTypes.ENUM("paid", "due", "past_due", "no_payment_required")
+    },
+    attachment: {
+      type: DataTypes.UUID,
+      references: { 
+        model: 'File',
+        key: 'id'
+      }
     }
   });
   return Bill;

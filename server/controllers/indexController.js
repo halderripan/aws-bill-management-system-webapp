@@ -7,8 +7,10 @@
 
 const users = require('./usersController');
 const bills = require('./billsController');
+const files = require('./filesController');
 
 module.exports = {
   users,
-  bills
+  bills,
+  files
 };

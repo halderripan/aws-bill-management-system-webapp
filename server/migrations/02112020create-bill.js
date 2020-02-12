@@ -40,6 +40,13 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+      },
+      attachment: {
+        type: Sequelize.UUID,
+        references: { 
+          model: 'Files',
+          key: 'id'
+        }
       }
     }),
   down: (queryInterface /* , Sequelize */) => queryInterface.dropTable('Bills'),
