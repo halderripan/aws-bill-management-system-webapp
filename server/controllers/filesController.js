@@ -201,7 +201,7 @@ module.exports = {
                                 delete file[0].dataValues.fileOwner;
                                 delete file[0].dataValues.size;
                                 delete file[0].dataValues.bill;
-                                delete file.dataValues.md5;
+                                delete file[0].dataValues.md5;
                                 res.status(200).send(file[0]);
                             })
                             .catch((error) => {
