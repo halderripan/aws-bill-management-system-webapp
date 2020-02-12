@@ -10,6 +10,7 @@ const User = require('../models/indexModel').User;
 const File = require('../models/indexModel').File;
 const moment = require('moment');
 const md5File = require('md5-file');
+const fs = require('fs');
 
 moment.suppressDeprecationWarnings = true;
 
@@ -86,36 +87,46 @@ module.exports = {
                         upload(req, res, function (err) {
                             if (err) {
                                 return res.status(400).send(err);
+                            } else {
+                                md5File(`public/uploads/${req.file.filename}`, (err10, hash) => {
+                                    if (err10) {
+                                        res.status(400).send(error);
+                                    }
+                                    else {
+                                        return File
+                                            .create({
+                                                file_name: req.file.filename,
+                                                url: `public/uploads/${req.file.filename}`,
+                                                upload_date: new Date(),
+                                                size: req.file.size,
+                                                fileOwner: user.dataValues.email_address,
+                                                bill: bills[0].dataValues.id,
+                                                md5: hash
+                                            })
+                                            .then((file) => {
+                                                delete file.dataValues.createdAt;
+                                                delete file.dataValues.updatedAt;
+                                                delete file.dataValues.fileOwner;
+                                                delete file.dataValues.size;
+                                                delete file.dataValues.bill;
+                                                delete file.dataValues.md5;
+                                                Bill
+                                                    .update(
+                                                        { attachment: file.dataValues.id },
+                                                        {
+                                                            where: {
+                                                                id: req.params.id
+                                                            }
+                                                        }
+                                                    )
+                                                res.status(201).send(file);
+                                            })
+                                            .catch((error) => {
+                                                res.status(400).send(error);
+                                            });
+                                    }
+                                })
                             }
-                            return File
-                                .create({
-                                    file_name: req.file.filename,
-                                    url: `/public/uploads/${req.file.filename}`,
-                                    upload_date: new Date(),
-                                    size: req.file.size,
-                                    fileOwner: user.dataValues.email_address,
-                                    bill: bills[0].dataValues.id
-                                })
-                                .then((file) => {
-                                    delete file.dataValues.createdAt;
-                                    delete file.dataValues.updatedAt;
-                                    delete file.dataValues.fileOwner;
-                                    delete file.dataValues.size;
-                                    delete file.dataValues.bill;
-                                    Bill
-                                        .update(
-                                            { attachment: file.dataValues.id },
-                                            {
-                                                where: {
-                                                    id: req.params.id
-                                                }
-                                            }
-                                        )
-                                    res.status(201).send(file);
-                                })
-                                .catch((error) => {
-                                    res.status(400).send(error);
-                                });
                         });
                     }
                 })
@@ -190,6 +201,7 @@ module.exports = {
                                 delete file[0].dataValues.fileOwner;
                                 delete file[0].dataValues.size;
                                 delete file[0].dataValues.bill;
+                                delete file.dataValues.md5;
                                 res.status(200).send(file[0]);
                             })
                             .catch((error) => {
@@ -277,20 +289,23 @@ module.exports = {
                                             })
                                         }
 
-                                        return File
-                                            .destroy({
-                                                where: {
-                                                    id: req.params.fileId
-                                                }
-                                            })
-                                            .then((rowDeleted) => {
-                                                if (rowDeleted === 1) {
-                                                    res.status(204).send('Deleted successfully');
-                                                }
-                                            })
-                                            .catch((error2) => {
-                                                res.status(400).send(error2);
-                                            });
+                                        fs.unlink(file[0].dataValues.url, function (err) {
+
+                                            return File
+                                                .destroy({
+                                                    where: {
+                                                        id: req.params.fileId
+                                                    }
+                                                })
+                                                .then((rowDeleted) => {
+                                                    if (rowDeleted === 1) {
+                                                        res.status(204).send('Deleted successfully');
+                                                    }
+                                                })
+                                                .catch((error2) => {
+                                                    res.status(400).send(error2);
+                                                });
+                                        });
                                     })
                                     .catch((error) => {
                                         if (error.parent.file == "uuid.c") {

@@ -6,9 +6,11 @@
  */
 
 const Bill = require('../models/indexModel').Bill;
+const File = require('../models/indexModel').File;
 const User = require('../models/indexModel').User;
 const moment = require('moment');
 moment.suppressDeprecationWarnings = true;
+const fs = require('fs');
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
@@ -55,9 +57,9 @@ module.exports = {
                     res.status(400).send(error);
                 });
         })
-        .catch((error) => {
-            res.status(400).send(error);
-        });
+            .catch((error) => {
+                res.status(400).send(error);
+            });
     },
 
     getBillByID(req, res) {
@@ -173,6 +175,24 @@ module.exports = {
                         return res.status(401).send({
                             message: "User not authorized to delete this Bill!"
                         })
+                    }
+                    if (bills[0].dataValues.attachment != null) {
+                        File
+                            .findAll({
+                                where: {
+                                    id: bills[0].dataValues.attachment
+                                }
+                            })
+                            .then((files) => {
+                                fs.unlink(files[0].dataValues.url, function (err) {
+                                    File
+                                        .destroy({
+                                            where: {
+                                                id: bills[0].dataValues.attachment
+                                            }
+                                        })
+                                })
+                            });
                     }
                     return Bill
                         .destroy({

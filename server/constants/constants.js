@@ -18,6 +18,7 @@ const REQUEST_PARAM = {
         AMOUNT_DUE:'amount_due',
         PAYMENTSTATUS:'paymentStatus',
         CATEGORIES:'categories',
+        ATTACHMENT : 'attachment'
     }
 }
 

@@ -31,6 +31,9 @@ module.exports = {
         },
         bill:{
           type: Sequelize.UUID
+        },
+        md5:{
+          type: Sequelize.STRING
         }
       }),
     down: (queryInterface /* , Sequelize */) => queryInterface.dropTable('Files'),

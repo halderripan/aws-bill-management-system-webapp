@@ -54,7 +54,10 @@ const createBillValidator = [
     .exists(),
     
     check(REQUEST_PARAM.CREATE_BILL.VENDOR)
-    .exists()
+    .exists(),
+
+    check(REQUEST_PARAM.CREATE_BILL.ATTACHMENT)
+    .not().exists()
 
 ]
 

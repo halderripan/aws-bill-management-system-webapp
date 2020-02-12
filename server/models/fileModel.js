@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       bill:{
         type: DataTypes.UUID
+      },
+      md5:{
+        type: DataTypes.STRING
       }
     });
     return File;
