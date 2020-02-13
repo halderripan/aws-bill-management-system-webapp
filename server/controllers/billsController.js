@@ -96,6 +96,8 @@ module.exports = {
                     bills[0].dataValues.attachment = bills[0].dataValues.File;
                     bills[0].dataValues.created_ts = bills[0].dataValues.createdAt;
                     bills[0].dataValues.updated_ts = bills[0].dataValues.updatedAt;
+                    if(bills[0].dataValues.attachment != null)
+                        delete bills[0].dataValues.attachment.dataValues.bill;
                     delete bills[0].dataValues.File;
                     delete bills[0].dataValues.createdAt;
                     delete bills[0].dataValues.updatedAt;
@@ -143,8 +145,8 @@ module.exports = {
                         bill.dataValues.created_ts = bill.dataValues.createdAt;
                         bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                         bill.dataValues.attachment = bill.dataValues.File;
-                        // console.log("bill.dataValues.attachment.bill --------------- : "+bill.dataValues.attachment.bill)
-                        // delete bill.dataValues.attachment.bill;
+                        if(bill.dataValues.attachment != null)
+                            delete bill.dataValues.attachment.dataValues.bill;
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
                         delete bill.dataValues.File;
