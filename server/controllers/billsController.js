@@ -11,6 +11,7 @@ const User = require('../models/indexModel').User;
 const moment = require('moment');
 moment.suppressDeprecationWarnings = true;
 const fs = require('fs');
+Bill.hasOne(File, { foreignKey: 'bill', onDelete: 'CASCADE' });
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
@@ -78,7 +79,8 @@ module.exports = {
                     where: {
                         id: req.params.id
                     },
-                    limit: 1
+                    limit: 1,
+                    include: File
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
@@ -91,10 +93,13 @@ module.exports = {
                             message: "User not authorized to view this Bill!"
                         })
                     }
+                    bills[0].dataValues.attachment = bills[0].dataValues.File;
                     bills[0].dataValues.created_ts = bills[0].dataValues.createdAt;
                     bills[0].dataValues.updated_ts = bills[0].dataValues.updatedAt;
+                    delete bills[0].dataValues.File;
                     delete bills[0].dataValues.createdAt;
                     delete bills[0].dataValues.updatedAt;
+
                     return res.status(200).send(bills[0])
                 })
                 .catch((error) => {
@@ -125,7 +130,8 @@ module.exports = {
                 .findAll({
                     where: {
                         owner_id: user.dataValues.id
-                    }
+                    },
+                    include: File
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
@@ -136,8 +142,12 @@ module.exports = {
                     bills.forEach(bill => {
                         bill.dataValues.created_ts = bill.dataValues.createdAt;
                         bill.dataValues.updated_ts = bill.dataValues.updatedAt;
+                        bill.dataValues.attachment = bill.dataValues.File;
+                        // console.log("bill.dataValues.attachment.bill --------------- : "+bill.dataValues.attachment.bill)
+                        // delete bill.dataValues.attachment.bill;
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
+                        delete bill.dataValues.File;
                     });
                     return res.status(200).send(bills);
                 })
@@ -239,7 +249,8 @@ module.exports = {
                     where: {
                         id: req.params.id
                     },
-                    limit: 1
+                    limit: 1,
+                    include: File
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
