@@ -5,12 +5,13 @@
  * @since 02/10/2020
  */
 
-const Bill = require('../models/indexModel').Bill;
-const User = require('../models/indexModel').User;
-const File = require('../models/indexModel').File;
+const Bill = require("../models/billModel").Bill;
+const File = require("../models/fileModel").Files;
+const User = require('../models/userModel').User;
 const moment = require('moment');
 const md5File = require('md5-file');
 const fs = require('fs');
+const uuidv4 = require('uuid/v4');
 
 moment.suppressDeprecationWarnings = true;
 
@@ -95,6 +96,7 @@ module.exports = {
                                     else {
                                         return File
                                             .create({
+                                                id: uuidv4(),
                                                 file_name: req.file.filename,
                                                 url: `public/uploads/${req.file.filename}`,
                                                 upload_date: new Date(),

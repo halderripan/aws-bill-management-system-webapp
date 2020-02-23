@@ -5,10 +5,12 @@
  * @since 01/20/2020
  */
 
-const User = require('../models/indexModel').User;
+const User = require('../models/userModel').User;
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
+
+const uuidv4 = require('uuid/v4');
 
 const { validationResult } = require('express-validator');
 
@@ -41,6 +43,7 @@ module.exports = {
           if (!flag) {
             return User
               .create({
+                id: uuidv4(),
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
                 email_address: req.body.email_address,

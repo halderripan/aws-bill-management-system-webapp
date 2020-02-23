@@ -4,54 +4,47 @@
  * @version  3.0
  * @since 01/26/2020
  */
-module.exports = (sequelize, DataTypes) => {
-  const Bill = sequelize.define('Bill', {
+const Sequelize = require('sequelize');
+const sequelize = require("../modules/applicationPropertiesSingleton.js").sequelize;
+var Bill = sequelize.define('bill', {
     id: {
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+        allowNull: false,
+        primaryKey: true,
+        type: Sequelize.UUID
     },
     owner_id: {
-      allowNull: false,
-      type: DataTypes.UUID,
-      noUpdate: true
+        allowNull: false,
+        type: Sequelize.UUID,
     },
     vendor: {
-      type: DataTypes.STRING
+        allowNull: false,
+        type: Sequelize.STRING
     },
     bill_date: {
-      type: DataTypes.DATEONLY,
-      validate: {
-        isDate: true
-      }
+        allowNull: false,
+        type: Sequelize.DATE
     },
     due_date: {
-      type: DataTypes.DATEONLY,
-      validate: {
-        isDate: true
-      }
+        allowNull: false,
+        type: Sequelize.DATE
     },
     amount_due: {
-      type: DataTypes.DOUBLE,
-      allowNull: false,
-      validate: {
-        min: 0.01
-      }
+        allowNull: false,
+        type: Sequelize.DOUBLE
     },
     categories: {
-      type: DataTypes.ARRAY(DataTypes.STRING)
+      type: Sequelize.ARRAY(Sequelize.STRING)
     },
     paymentStatus: {
-      type: DataTypes.ENUM("paid", "due", "past_due", "no_payment_required")
-    },
-    attachment: {
-      type: DataTypes.UUID,
-      references: { 
-        model: 'File',
-        key: 'id'
-      }
+        allowNull: false,
+        type: Sequelize.ENUM('paid', 'due', 'past_due', 'no_payment_required')
     }
-  });
-  return Bill;
-};
+},
+    {
+        updatedAt: 'updated_ts',
+        createdAt: 'created_ts'
+    })
+sequelize.sync();
+module.exports = {
+    Bill
+}
