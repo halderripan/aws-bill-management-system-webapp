@@ -33,7 +33,7 @@ var Bill = sequelize.define('bill', {
         type: Sequelize.DOUBLE
     },
     categories: {
-      type: Sequelize.ARRAY(Sequelize.STRING)
+        type: Sequelize.ARRAY(Sequelize.STRING)
     },
     paymentStatus: {
         allowNull: false,

@@ -90,12 +90,15 @@ module.exports = {
                             message: "User not authorized to view this Bill!"
                         })
                     }
-                    bills[0].dataValues.attachment = bills[0].dataValues.File;
                     bills[0].dataValues.created_ts = bills[0].dataValues.createdAt;
                     bills[0].dataValues.updated_ts = bills[0].dataValues.updatedAt;
-                    if (bills[0].dataValues.attachment != null)
+                    if (bills[0].dataValues.attachment != null){
                         delete bills[0].dataValues.attachment.dataValues.bill;
-                    delete bills[0].dataValues.File;
+                        delete bills[0].dataValues.attachment.dataValues.md5;
+                        delete bills[0].dataValues.attachment.dataValues.size;
+                    }else{
+                        bills[0].dataValues.attachment = null;
+                    }
                     delete bills[0].dataValues.createdAt;
                     delete bills[0].dataValues.updatedAt;
 
@@ -144,12 +147,15 @@ module.exports = {
                     bills.forEach(bill => {
                         bill.dataValues.created_ts = bill.dataValues.createdAt;
                         bill.dataValues.updated_ts = bill.dataValues.updatedAt;
-                        bill.dataValues.attachment = bill.dataValues.File;
-                        if (bill.dataValues.attachment != null)
+                        if (bill.dataValues.attachment != null){
                             delete bill.dataValues.attachment.dataValues.bill;
+                            delete bill.dataValues.attachment.dataValues.md5;
+                            delete bill.dataValues.attachment.dataValues.size;
+                        }else{
+                            
+                        }
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
-                        delete bill.dataValues.File;
                     });
                     return res.status(200).send(bills);
                 })
