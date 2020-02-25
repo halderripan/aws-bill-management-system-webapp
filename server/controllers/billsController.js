@@ -5,9 +5,9 @@
  * @since 01/20/2020
  */
 
-const Bill = require('../models/indexModel').Bill;
-const File = require('../models/indexModel').File;
-const User = require('../models/indexModel').User;
+const Bill = require("../models/billModel").Bill;
+const File = require("../models/fileModel").Files;
+const User = require('../models/userModel').User;
 const moment = require('moment');
 moment.suppressDeprecationWarnings = true;
 const fs = require('fs');
@@ -17,6 +17,7 @@ Bill.hasOne(File, { foreignKey: 'bill', onDelete: 'CASCADE' });
 const bcrypt = require(`bcrypt`);
 const Promise = require('promise');
 
+const uuidv4 = require('uuid/v4');
 const { validationResult } = require('express-validator');
 
 module.exports = {
@@ -32,30 +33,26 @@ module.exports = {
             return;
         }
         authorizeAnUser(req, res).then(function (user) {
+            billData = req.body;
+            billData.id = uuidv4();
+            billData.owner_id = user.id;
             return Bill
-                .create({
-                    owner_id: user.id,
-                    vendor: req.body.vendor,
-                    bill_date: req.body.bill_date,
-                    due_date: req.body.due_date,
-                    amount_due: req.body.amount_due,
-                    categories: req.body.categories,
-                    paymentStatus: req.body.paymentStatus
-                })
+                .create(billData)
                 .then((bill) => {
+                    console.log("Test 1---------------------");
                     bill.dataValues.created_ts = bill.dataValues.createdAt;
                     bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                     delete bill.dataValues.createdAt;
                     delete bill.dataValues.updatedAt;
                     res.status(201).send(bill)
                 })
-                .catch((error) => {
-                    if (error.errors[0].value == "Invalid date") {
+                .catch((error1) => {
+                    if (error1.errors[0].value == "Invalid date") {
                         res.status(400).send({
                             message: "Invalid Date!"
                         });
                     }
-                    res.status(400).send(error);
+                    res.status(400).send(error1);
                 });
         })
             .catch((error) => {
@@ -93,12 +90,15 @@ module.exports = {
                             message: "User not authorized to view this Bill!"
                         })
                     }
-                    bills[0].dataValues.attachment = bills[0].dataValues.File;
                     bills[0].dataValues.created_ts = bills[0].dataValues.createdAt;
                     bills[0].dataValues.updated_ts = bills[0].dataValues.updatedAt;
-                    if(bills[0].dataValues.attachment != null)
+                    if (bills[0].dataValues.attachment != null){
                         delete bills[0].dataValues.attachment.dataValues.bill;
-                    delete bills[0].dataValues.File;
+                        delete bills[0].dataValues.attachment.dataValues.md5;
+                        delete bills[0].dataValues.attachment.dataValues.size;
+                    }else{
+                        bills[0].dataValues.attachment = null;
+                    }
                     delete bills[0].dataValues.createdAt;
                     delete bills[0].dataValues.updatedAt;
 
@@ -114,6 +114,9 @@ module.exports = {
                         message: "Bill Not Found!"
                     })
                 });
+        })
+        .catch((error) => {
+            res.status(400).send(error);
         });
     },
 
@@ -144,18 +147,24 @@ module.exports = {
                     bills.forEach(bill => {
                         bill.dataValues.created_ts = bill.dataValues.createdAt;
                         bill.dataValues.updated_ts = bill.dataValues.updatedAt;
-                        bill.dataValues.attachment = bill.dataValues.File;
-                        if(bill.dataValues.attachment != null)
+                        if (bill.dataValues.attachment != null){
                             delete bill.dataValues.attachment.dataValues.bill;
+                            delete bill.dataValues.attachment.dataValues.md5;
+                            delete bill.dataValues.attachment.dataValues.size;
+                        }else{
+                            
+                        }
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
-                        delete bill.dataValues.File;
                     });
                     return res.status(200).send(bills);
                 })
                 .catch((error) => res.status(400).send({
                     message: "Bill not found!"
                 }));
+        })
+        .catch((error) => {
+            res.status(400).send(error);
         });
     },
 
@@ -204,6 +213,9 @@ module.exports = {
                                             }
                                         })
                                 })
+                            })
+                            .catch((error10) => {
+                                res.status(400).send(error10);
                             });
                     }
                     return Bill
@@ -232,6 +244,9 @@ module.exports = {
                         message: "Bill Not Found!"
                     })
                 });
+        })
+        .catch((error) => {
+            res.status(400).send(error);
         });
     },
 
@@ -319,6 +334,9 @@ module.exports = {
                         message: "Bill Not Found!"
                     })
                 });
+        })
+        .catch((error) => {
+            res.status(400).send(error);
         });
     }
 }
