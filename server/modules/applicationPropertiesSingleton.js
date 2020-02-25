@@ -1,23 +1,39 @@
 var Sequelize = require('sequelize');
 const { Pool, Client } = require('pg');
-var sequelize = new Sequelize('cloudassignment', 'postgres', 'Qwe1Asd2Zxc3',
+const username = process.env.DB_USERNAME;
+const password = process.env.DB_PASSWORD;
+const host = process.env.DB_HOST;
+const dbName = process.env.DB_NAME;
+const port = process.env.DB_PORT;
+
+// const username = 'postgres';
+// const password = 'Qwe1Asd2Zxc3';
+// const host = 'localhost';
+// const dbName = 'cloudassignment';
+var sequelize = new Sequelize(dbName, username, password,
     {
-        host: 'localhost',
-        dialect: 'postgres'
+        host: host,
+        port: port,
+        dialect: 'postgres',
+        dialectOptions: {
+            ssl:'Amazon RDS'
+        },
+        pool: { maxConnections: 5, maxIdleTime: 30},
+        language: 'en'
     }
 
 );
-const username = 'postgres';
-const password = 'Qwe1Asd2Zxc3';
-const host = 'localhost';
-const dbName = 'cloudassignment';
-const connectionString = 'postgres://' + username + ':' + password + '@' + host + '/postgres';
+// const connectionString = 'postgres://' + username + ':' + password + '@' + host + '/postgres';
 
 const init = function (callback) {
     const client = new Client({
-        connectionString: connectionString
+        user: username,
+        host: host,
+        database: dbName,
+        password: password,
+        port: port
     })
-    
+
     client.connect();
     client.query('CREATE DATABASE ' + dbName, function (err) {
         callback(null);
