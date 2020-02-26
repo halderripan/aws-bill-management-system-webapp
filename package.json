@@ -16,6 +16,7 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "express-validator": "^6.3.1",
+    "formidable": "^1.2.2",
     "fs": "0.0.1-security",
     "fstream": "^1.0.12",
     "is-my-json-valid": "^2.20.0",
