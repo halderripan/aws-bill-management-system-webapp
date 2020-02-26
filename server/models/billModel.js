@@ -14,7 +14,7 @@ var Bill = sequelize.define('bill', {
     },
     owner_id: {
         allowNull: false,
-        type: Sequelize.UUID,
+        type: Sequelize.UUID
     },
     vendor: {
         allowNull: false,
