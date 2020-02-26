@@ -17,9 +17,6 @@ var sequelize = new Sequelize(dbName, username, password,
         host: host,
         port: port,
         dialect: 'postgres',
-        dialectOptions: {
-            ssl:'Amazon RDS'
-        },
         pool: { maxConnections: 5, maxIdleTime: 30},
         language: 'en'
     }
