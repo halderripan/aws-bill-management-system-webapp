@@ -21,10 +21,14 @@ props.init(function (req, res) {
   const billsModel = require(path.resolve(".") + "/server/models/billModel").Bill;
   const fileModel = require(path.resolve(".") + "/server/models/fileModel").Files;
 
-  userModel.hasMany(billsModel, { as: 'bills', foreignKey: 'owner_id' })
+  userModel.hasMany(billsModel, { as: 'bills', foreignKey: 'owner_id' });
   billsModel.hasOne(fileModel, { foreignKey: 'bill', onDelete: 'CASCADE' });
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
+
+  process.on('unhandledRejection', (err, p) => {
+    console.log(`Rejection: ${err}`);
+  });
 
   require('./server/routes')(app);
   app.get('*', (req, res) => res.status(200).send({
