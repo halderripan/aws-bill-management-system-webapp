@@ -12,12 +12,19 @@ const moment = require('moment');
 const md5File = require('md5-file');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
+const aws = require('aws-sdk');
+aws.config.update({
+    "region": 'us-east-1'
+});
 
 moment.suppressDeprecationWarnings = true;
 
 const path = require('path');
 
 const multer = require('multer');
+const multerS3 = require('multer-s3');
+const s3 = new aws.S3({ apiVersion: '2006-03-01' });
+const bucket = process.env.S3_BUCKET;
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/uploads')
@@ -26,6 +33,22 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + '-' + file.originalname)
     }
 });
+
+const uploadS3 = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: bucket,
+        acl: 'private',
+        contentType: multerS3.AUTO_CONTENT_TYPE,
+        //   serverSideEncryption: 'AES256',
+        metadata: function (req, file, cb) {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key: function (req, file, cb) {
+            cb(null, Date.now() + '-' + file.originalname)
+        }
+    })
+}).single('billAttachment');
 
 const upload = multer({
     storage: storage,
@@ -85,49 +108,45 @@ module.exports = {
                     }
                     else {
 
-                        upload(req, res, function (err) {
+                        console.log("----------- REGION  ------------ " + aws.config.region);
+                        uploadS3(req, res, function (err) {
                             if (err) {
                                 return res.status(400).send(err);
                             } else {
-                                md5File(`public/uploads/${req.file.filename}`, (err10, hash) => {
-                                    if (err10) {
+                                console.log("-----------------------------------------------------------------------")
+                                console.log(req.file);
+                                return File
+                                    .create({
+                                        id: uuidv4(),
+                                        file_name: req.file.originalname,
+                                        url: req.file.location,
+                                        upload_date: new Date(),
+                                        size: req.file.size,
+                                        fileOwner: user.dataValues.email_address,
+                                        bill: bills[0].dataValues.id,
+                                        md5: req.file.metadata.fieldName
+                                    })
+                                    .then((file) => {
+                                        delete file.dataValues.createdAt;
+                                        delete file.dataValues.updatedAt;
+                                        delete file.dataValues.fileOwner;
+                                        delete file.dataValues.size;
+                                        delete file.dataValues.bill;
+                                        delete file.dataValues.md5;
+                                        Bill
+                                            .update(
+                                                { attachment: file.dataValues.id },
+                                                {
+                                                    where: {
+                                                        id: req.params.id
+                                                    }
+                                                }
+                                            )
+                                        res.status(201).send(file);
+                                    })
+                                    .catch((error) => {
                                         res.status(400).send(error);
-                                    }
-                                    else {
-                                        return File
-                                            .create({
-                                                id: uuidv4(),
-                                                file_name: req.file.filename,
-                                                url: `public/uploads/${req.file.filename}`,
-                                                upload_date: new Date(),
-                                                size: req.file.size,
-                                                fileOwner: user.dataValues.email_address,
-                                                bill: bills[0].dataValues.id,
-                                                md5: hash
-                                            })
-                                            .then((file) => {
-                                                delete file.dataValues.createdAt;
-                                                delete file.dataValues.updatedAt;
-                                                delete file.dataValues.fileOwner;
-                                                delete file.dataValues.size;
-                                                delete file.dataValues.bill;
-                                                delete file.dataValues.md5;
-                                                Bill
-                                                    .update(
-                                                        { attachment: file.dataValues.id },
-                                                        {
-                                                            where: {
-                                                                id: req.params.id
-                                                            }
-                                                        }
-                                                    )
-                                                res.status(201).send(file);
-                                            })
-                                            .catch((error) => {
-                                                res.status(400).send(error);
-                                            });
-                                    }
-                                })
+                                    });
                             }
                         });
                     }
