@@ -41,7 +41,9 @@ jobs: # a collection of steps
           command: aws s3 cp application.zip s3://$AWS_BUCKET_NAME
       - run:
           name: Create Deployment
-          command: aws deploy create-deployment --application-name webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $DEPLOYMEMENT_GROUP --s3-location bucket=$AWS_BUCKET_NAME,bundleType=zip,key=application.zip 
+          command: |
+            aws configure
+            aws deploy create-deployment --application-name $CODE_DEPLOY_APP_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $DEPLOYMEMENT_GROUP --s3-location bucket=$AWS_BUCKET_NAME,bundleType=zip,key=application.zip 
 
   pr_check: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/webapp # directory where steps will run
