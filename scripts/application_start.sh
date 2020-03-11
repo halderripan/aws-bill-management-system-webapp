@@ -1,5 +1,8 @@
 #!/bin/bash
 
 # Stop all servers and start the server as a daemon
-forever stopall
-forever start /home/ubuntu/bin/www
+# forever stopall
+# forever start /home/ubuntu/bin/www
+
+sudo kill -9 `sudo lsof -t -i:8000`
+npm start
