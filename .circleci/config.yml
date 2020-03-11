@@ -34,7 +34,7 @@ jobs: # a collection of steps
       - run:
           name: Zip JAR File
           command: |
-            zip -r application.zip server.js README.md package.json package-lock.json .gitignore .eslintrc.json test temp server scripts appspec.yml
+            zip -r application.zip server.js README.md package.json package-lock.json .gitignore .eslintrc.json test temp server bin scripts appspec.yml
             chmod 777 application.zip 
       - run:
           name: Upload ZIP to S3 bucket
