@@ -42,7 +42,6 @@ jobs: # a collection of steps
       - run:
           name: Create Deployment
           command: |
-            aws configure
             aws deploy create-deployment --application-name $CODE_DEPLOY_APP_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $DEPLOYMEMENT_GROUP --s3-location bucket=$AWS_BUCKET_NAME,bundleType=zip,key=application.zip 
 
   pr_check: # runs not using Workflows must have a `build` job as entry point
