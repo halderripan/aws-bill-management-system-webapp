@@ -6,4 +6,5 @@
 
 # sudo kill -9 `sudo lsof -t -i:8000`
 cd /home/ubuntu/
-npm start
+# npm start
+pm2 start server.js
