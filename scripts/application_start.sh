@@ -7,4 +7,5 @@ cd /home/ubuntu/
 
 # sudo kill -9 `sudo lsof -t -i:8000`
 # npm start
-pm2 start server.js
+pm2 stop all
+pm2 start ./bin/www
