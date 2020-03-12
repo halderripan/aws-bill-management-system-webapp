@@ -11,7 +11,7 @@ module.exports = (app) => {
   // User Routes
   app.get('/v1/user/self', userController.getUser);
   app.put('/v1/user/self', createUserValidator, userController.updateUser);
-  app.post('/v1/user', createUserValidator, userController.createUser);
+  app.post('/v2/user', createUserValidator, userController.createUser);
 
   // Bill Routes
   app.get('/v1/bill/:id', billController.getBillByID);
