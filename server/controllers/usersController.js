@@ -20,6 +20,7 @@ module.exports = {
 
   //Creating a new User
   createUser(req, res) {
+    LOGGER.info("Creating a  User!");
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -33,6 +34,7 @@ module.exports = {
       })
       .then(user => {
         if (user.length > 0) {
+          LOGGER.error("User already exists! Provide a different email_address / username!");
           return res.status(400).send({
             message: `User already exists! Provide a different email_address / username!`,
           });
