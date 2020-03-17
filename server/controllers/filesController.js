@@ -16,6 +16,8 @@ const aws = require('aws-sdk');
 aws.config.update({
     "region": 'us-east-1'
 });
+//Logger
+const LOGGER = require("../logger/logger.js");
 
 moment.suppressDeprecationWarnings = true;
 

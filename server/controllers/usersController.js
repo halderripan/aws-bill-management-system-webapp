@@ -13,6 +13,8 @@ const bcrypt = require(`bcrypt`);
 const uuidv4 = require('uuid/v4');
 
 const { validationResult } = require('express-validator');
+//Logger
+const LOGGER = require("../logger/logger.js");
 
 module.exports = {
 

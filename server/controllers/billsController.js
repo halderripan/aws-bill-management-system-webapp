@@ -22,12 +22,15 @@ const { validationResult } = require('express-validator');
 const aws = require('aws-sdk');
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
 const bucket = process.env.S3_BUCKET;
+//Logger
+const LOGGER = require("../logger/logger.js");
 
 module.exports = {
 
     createBill(req, res) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.error({ errors: errors.array() });
             return res.status(400).json({ errors: errors.array() })
         }
 
@@ -216,10 +219,10 @@ module.exports = {
                                 //             }
                                 //         })
                                 // })
-                                console.log(" ------------------------------------ ");
-                                console.log(files[0].dataValues.key);
-                                console.log(" ------------------------------------ ");
-                                console.log(files[0].key);
+                                LOGGER.debug("-------Files-----Datavalues------------------------ ");
+                                LOGGER.debug(files[0].dataValues.key);
+                                LOGGER.debug("-------Files------Key----------------------- ");
+                                LOGGER.debug(files[0].key);
                                 s3.deleteObject({
                                     Bucket: bucket,
                                     Key: files[0].key

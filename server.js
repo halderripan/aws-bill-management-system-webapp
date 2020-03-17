@@ -10,7 +10,8 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const path = require("path");
 const props = require("./server/modules/applicationPropertiesSingleton.js");
-var Promise = require('promise');
+//Logger
+const LOGGER = require(path.resolve('.') + '/server/logger/logger.js');
 
 const app = express();
 app.use(logger('dev'));
