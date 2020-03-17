@@ -2,6 +2,7 @@
 sudo npm install forever -g
 sudo npm install pm2 -g
 cd /home/ubuntu/
+
 sudo npm install
 
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
@@ -9,3 +10,8 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
     -m ec2 \
     -c file:cloudwatch-config.json \
     -s
+
+
+cd server
+mkdir logs
+cd /home/ubuntu/
