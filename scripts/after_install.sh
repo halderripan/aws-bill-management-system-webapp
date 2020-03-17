@@ -12,6 +12,6 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
     -s
 
 
-cd server
+cd /home/ubuntu/server/
 mkdir logs
 cd /home/ubuntu/
