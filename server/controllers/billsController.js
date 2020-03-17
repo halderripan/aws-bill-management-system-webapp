@@ -24,12 +24,13 @@ const s3 = new aws.S3({ apiVersion: '2006-03-01' });
 const bucket = process.env.S3_BUCKET;
 //Logger
 const LOGGER = require("../logger/logger.js");
-const StatsD = require('node-statsd'), client = new StatsD();
+const SDC = require('statsd-client'),
+const sdc = new SDC({host: 'localhost', port: 8125});
 
 module.exports = {
 
     createBill(req, res) {
-        client.increment('createBill');
+        sdc.increment('createBill');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             LOGGER.error({ errors: errors.array() });
@@ -69,7 +70,7 @@ module.exports = {
     },
 
     getBillByID(req, res) {
-        client.increment('getBillByID');
+        // client.increment('getBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -130,7 +131,7 @@ module.exports = {
     },
 
     getAllBills(req, res) {
-        client.increment('getAllBills');
+        // client.increment('getAllBills');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -179,7 +180,7 @@ module.exports = {
     },
 
     deleteBillByID(req, res) {
-        client.increment('deleteBillByID');
+        // client.increment('deleteBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -291,7 +292,7 @@ module.exports = {
     },
 
     updateBillByID(req, res) {
-        client.increment('updateBillByID');
+        // client.increment('updateBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
