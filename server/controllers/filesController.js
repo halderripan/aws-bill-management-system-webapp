@@ -36,9 +36,9 @@ var params = {
   
   cw.putMetricData(params, function(err, data) {
     if (err) {
-      console.log("Error", err);
+        LOGGER.error("Error", err);
     } else {
-      console.log("Success", JSON.stringify(data));
+        LOGGER.debug("Success", JSON.stringify(data));
     }
   });
 // Create CloudWatch service object
