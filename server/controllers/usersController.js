@@ -15,11 +15,13 @@ const uuidv4 = require('uuid/v4');
 const { validationResult } = require('express-validator');
 //Logger
 const LOGGER = require("../logger/logger.js");
+const StatsD = require('node-statsd'), client = new StatsD();
 
 module.exports = {
 
   //Creating a new User
   createUser(req, res) {
+    client.increment('createUser');
     LOGGER.info("Creating a  User!");
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -82,6 +84,7 @@ module.exports = {
   },
 
   updateUser(req, res) {
+    client.increment('updateUser');
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -149,6 +152,7 @@ module.exports = {
   },
 
   getUser(req, res) {
+    client.increment('getUser');
 
     if (!req.headers.authorization) {
       authenticationStatus(res);

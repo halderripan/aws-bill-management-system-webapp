@@ -16,6 +16,7 @@ const aws = require('aws-sdk');
 aws.config.update({
     "region": 'us-east-1'
 });
+const StatsD = require('node-statsd'), client = new StatsD();
 // Create parameters JSON for putMetricData
 var params = {
     MetricData: [
@@ -110,6 +111,7 @@ const { validationResult } = require('express-validator');
 module.exports = {
 
     createFile(req, res) {
+        client.increment('createFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -211,6 +213,7 @@ module.exports = {
     },
 
     getFile(req, res) {
+        client.increment('getFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -296,6 +299,7 @@ module.exports = {
     },
 
     deleteFile(req, res) {
+        client.increment('deleteFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
