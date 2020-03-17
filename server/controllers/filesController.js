@@ -16,6 +16,33 @@ const aws = require('aws-sdk');
 aws.config.update({
     "region": 'us-east-1'
 });
+// Create parameters JSON for putMetricData
+var params = {
+    MetricData: [
+      {
+        MetricName: 'PAGES_VISITED',
+        Dimensions: [
+          {
+            Name: 'UNIQUE_PAGES',
+            Value: 'URLS'
+          },
+        ],
+        Unit: 'None',
+        Value: 1.0
+      },
+    ],
+    Namespace: 'SITE/TRAFFIC'
+  };
+  
+  cw.putMetricData(params, function(err, data) {
+    if (err) {
+      console.log("Error", err);
+    } else {
+      console.log("Success", JSON.stringify(data));
+    }
+  });
+// Create CloudWatch service object
+const cw = new AWS.CloudWatch({apiVersion: '2010-08-01'});
 //Logger
 const LOGGER = require("../logger/logger.js");
 
