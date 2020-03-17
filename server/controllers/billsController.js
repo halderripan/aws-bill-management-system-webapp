@@ -216,6 +216,10 @@ module.exports = {
                                 //             }
                                 //         })
                                 // })
+                                console.log(" ------------------------------------ ");
+                                console.log(files[0].dataValues.key);
+                                console.log(" ------------------------------------ ");
+                                console.log(files[0].key);
                                 s3.deleteObject({
                                     Bucket: bucket,
                                     Key: files[0].key
