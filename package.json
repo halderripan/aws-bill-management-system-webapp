@@ -29,6 +29,7 @@
     "morgan": "^1.7.0",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
+    "node-statsd": "^0.1.1",
     "pg": "^7.18.2",
     "promise": "^8.0.3",
     "properties-reader": "^1.0.0",

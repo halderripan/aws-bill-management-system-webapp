@@ -2,6 +2,7 @@ const userController = require('../controllers/indexController').users;
 const billController = require('../controllers/indexController').bills;
 const fileController = require('../controllers/indexController').files;
 const { createUserValidator, createBillValidator, paymentStatusValidator } = require('../utils/validations');
+const StatsD = require('node-statsd'), client = new StatsD();
 
 module.exports = (app) => {
   app.get('/v1', (req, res) => res.status(200).send({
