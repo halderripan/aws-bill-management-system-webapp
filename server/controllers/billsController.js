@@ -19,6 +19,9 @@ const Promise = require('promise');
 
 const uuidv4 = require('uuid/v4');
 const { validationResult } = require('express-validator');
+const aws = require('aws-sdk');
+const s3 = new aws.S3({ apiVersion: '2006-03-01' });
+const bucket = process.env.S3_BUCKET;
 
 module.exports = {
 
@@ -92,11 +95,11 @@ module.exports = {
                     }
                     bills[0].dataValues.created_ts = bills[0].dataValues.createdAt;
                     bills[0].dataValues.updated_ts = bills[0].dataValues.updatedAt;
-                    if (bills[0].dataValues.attachment != null){
+                    if (bills[0].dataValues.attachment != null) {
                         delete bills[0].dataValues.attachment.dataValues.bill;
                         delete bills[0].dataValues.attachment.dataValues.md5;
                         delete bills[0].dataValues.attachment.dataValues.size;
-                    }else{
+                    } else {
                         bills[0].dataValues.attachment = null;
                     }
                     delete bills[0].dataValues.createdAt;
@@ -115,9 +118,9 @@ module.exports = {
                     })
                 });
         })
-        .catch((error) => {
-            res.status(400).send(error);
-        });
+            .catch((error) => {
+                res.status(400).send(error);
+            });
     },
 
     getAllBills(req, res) {
@@ -147,12 +150,12 @@ module.exports = {
                     bills.forEach(bill => {
                         bill.dataValues.created_ts = bill.dataValues.createdAt;
                         bill.dataValues.updated_ts = bill.dataValues.updatedAt;
-                        if (bill.dataValues.attachment != null){
+                        if (bill.dataValues.attachment != null) {
                             delete bill.dataValues.attachment.dataValues.bill;
                             delete bill.dataValues.attachment.dataValues.md5;
                             delete bill.dataValues.attachment.dataValues.size;
-                        }else{
-                            
+                        } else {
+
                         }
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
@@ -163,9 +166,9 @@ module.exports = {
                     message: "Bill not found!"
                 }));
         })
-        .catch((error) => {
-            res.status(400).send(error);
-        });
+            .catch((error) => {
+                res.status(400).send(error);
+            });
     },
 
     deleteBillByID(req, res) {
@@ -205,13 +208,38 @@ module.exports = {
                                 }
                             })
                             .then((files) => {
-                                fs.unlink(files[0].dataValues.url, function (err) {
-                                    File
-                                        .destroy({
-                                            where: {
-                                                id: bills[0].dataValues.attachment
-                                            }
+                                // fs.unlink(files[0].dataValues.url, function (err) {
+                                //     File
+                                //         .destroy({
+                                //             where: {
+                                //                 id: bills[0].dataValues.attachment
+                                //             }
+                                //         })
+                                // })
+                                s3.deleteObject({
+                                    Bucket: bucket,
+                                    Key: files[0].key
+                                }, function (err09) {
+                                    if (err09) {
+                                        return res.status(400).send({
+                                            message: "Error while deleting from S3!"
                                         })
+                                    } else {
+                                        return File
+                                            .destroy({
+                                                where: {
+                                                    id: bills[0].dataValues.attachment
+                                                }
+                                            })
+                                            .then((rowDeleted) => {
+                                                if (rowDeleted === 1) {
+                                                    res.status(204).send('Deleted successfully');
+                                                }
+                                            })
+                                            .catch((error2) => {
+                                                res.status(400).send(error2);
+                                            });
+                                    }
                                 })
                             })
                             .catch((error10) => {
@@ -245,9 +273,9 @@ module.exports = {
                     })
                 });
         })
-        .catch((error) => {
-            res.status(400).send(error);
-        });
+            .catch((error) => {
+                res.status(400).send(error);
+            });
     },
 
     updateBillByID(req, res) {
@@ -335,9 +363,9 @@ module.exports = {
                     })
                 });
         })
-        .catch((error) => {
-            res.status(400).send(error);
-        });
+            .catch((error) => {
+                res.status(400).send(error);
+            });
     }
 }
 
