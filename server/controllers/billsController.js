@@ -228,7 +228,8 @@ module.exports = {
                     where: {
                         id: req.params.id
                     },
-                    limit: 1
+                    limit: 1,
+                    include: File
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
