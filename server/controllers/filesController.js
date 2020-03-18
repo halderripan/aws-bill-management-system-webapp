@@ -40,7 +40,7 @@ const storage = multer.diskStorage({
 
 const uploadS3 = multer({
     fileFilter: function (req, file, callback) {
-        var ext = path.extname(file.originalname);
+        let ext = path.extname(file.originalname);
         if (ext !== '.png' && ext !== '.jpg' && ext !== '.pdf' && ext !== '.jpeg') {
             return callback({ "Error": "Only pdfs & images are allowed" }, false);
         }
@@ -64,7 +64,7 @@ const uploadS3 = multer({
 const upload = multer({
     storage: storage,
     fileFilter: function (req, file, callback) {
-        var ext = path.extname(file.originalname);
+        let ext = path.extname(file.originalname);
         if (ext !== '.png' && ext !== '.jpg' && ext !== '.pdf' && ext !== '.jpeg') {
             return callback({ "Error": "Only pdfs & images are allowed" }, false);
         }
@@ -84,6 +84,7 @@ const { validationResult } = require('express-validator');
 module.exports = {
 
     createFile(req, res) {
+        let startDate = new Date();
         client.increment('createFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -127,7 +128,7 @@ module.exports = {
                             } else {
                                 console.log("-----------------------------------------------------------------------")
                                 console.log(req.file);
-                                
+
                                 return File
                                     .create({
                                         id: uuidv4(),
@@ -137,7 +138,7 @@ module.exports = {
                                         size: req.file.size,
                                         fileOwner: user.dataValues.email_address,
                                         bill: bills[0].dataValues.id,
-                                        md5: "fieldName =>"+ req.file.fieldname,
+                                        md5: "fieldName =>" + req.file.fieldname,
                                         key: req.file.key
                                     })
                                     .then((file) => {
@@ -157,6 +158,9 @@ module.exports = {
                                                     }
                                                 }
                                             )
+                                        let endDate = new Date();
+                                        let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                        client.timing('successfulUserFetch_APICallTime', seconds);
                                         res.status(201).send(file);
                                     })
                                     .catch((error) => {
@@ -186,6 +190,7 @@ module.exports = {
     },
 
     getFile(req, res) {
+        let startDate = new Date();
         client.increment('getFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -240,6 +245,9 @@ module.exports = {
                                 delete file[0].dataValues.bill;
                                 delete file[0].dataValues.md5;
                                 delete file[0].dataValues.key;
+                                let endDate   = new Date();
+                                let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                client.timing('successfulUserFetch_APICallTime', seconds);
                                 res.status(200).send(file[0]);
                             })
                             .catch((error) => {
@@ -272,6 +280,7 @@ module.exports = {
     },
 
     deleteFile(req, res) {
+        let startDate = new Date();
         client.increment('deleteFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -344,6 +353,9 @@ module.exports = {
                                                     })
                                                     .then((rowDeleted) => {
                                                         if (rowDeleted === 1) {
+                                                            let endDate   = new Date();
+                                                            let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                                            client.timing('successfulUserFetch_APICallTime', seconds);
                                                             res.status(204).send('Deleted successfully');
                                                         }
                                                     })

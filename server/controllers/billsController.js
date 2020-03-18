@@ -30,6 +30,7 @@ const sdc = new SDC({host: 'localhost', port: 8125});
 module.exports = {
 
     createBill(req, res) {
+        let startDate = new Date();
         sdc.increment('createBill');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -53,6 +54,9 @@ module.exports = {
                     bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                     delete bill.dataValues.createdAt;
                     delete bill.dataValues.updatedAt;
+                    let endDate = new Date();
+                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                    sdc.timing('successfulCreateBill_APICallTime', seconds);
                     res.status(201).send(bill)
                 })
                 .catch((error1) => {
@@ -70,6 +74,7 @@ module.exports = {
     },
 
     getBillByID(req, res) {
+        let startDate = new Date();
         // client.increment('getBillByID');
         sdc.increment('getBillByID');
         const errors = validationResult(req)
@@ -112,6 +117,9 @@ module.exports = {
                     }
                     delete bills[0].dataValues.createdAt;
                     delete bills[0].dataValues.updatedAt;
+                    let endDate = new Date();
+                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                    sdc.timing('successfulGetBillByID_APICallTime', seconds);
 
                     return res.status(200).send(bills[0])
                 })
@@ -132,6 +140,7 @@ module.exports = {
     },
 
     getAllBills(req, res) {
+        let startDate = new Date();
         // client.increment('getAllBills');
         sdc.increment('getAllBills');
         const errors = validationResult(req)
@@ -170,6 +179,9 @@ module.exports = {
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
                     });
+                    let endDate = new Date();
+                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                    sdc.timing('successfulGetAllBills_APICallTime', seconds);
                     return res.status(200).send(bills);
                 })
                 .catch((error) => res.status(400).send({
@@ -182,6 +194,7 @@ module.exports = {
     },
 
     deleteBillByID(req, res) {
+        let startDate = new Date();
         // client.increment('deleteBillByID');
         sdc.increment('deleteBillByID');
         const errors = validationResult(req)
@@ -249,6 +262,9 @@ module.exports = {
                                             })
                                             .then((rowDeleted) => {
                                                 if (rowDeleted === 1) {
+                                                    let endDate = new Date();
+                                                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                                    sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
                                                     res.status(204).send('Deleted successfully');
                                                 }
                                             })
@@ -295,6 +311,7 @@ module.exports = {
     },
 
     updateBillByID(req, res) {
+        let startDate = new Date();
         // client.increment('updateBillByID');
         sdc.increment('updateBillByID');
         const errors = validationResult(req)
@@ -355,6 +372,9 @@ module.exports = {
                                         delete bill.dataValues.createdAt;
                                         delete bill.dataValues.updatedAt;
                                     });
+                                    let endDate = new Date();
+                                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                    sdc.timing('successfulUpdateBillByID_APICallTime', seconds);
                                     return res.status(200).send(bills[0]);
                                 })
                                 .catch((error) => res.status(400).send({
