@@ -246,8 +246,8 @@ module.exports = {
                     LOGGER.info(bills[0].dataValues);
                     LOGGER.info("-----------bills[0]-------------");
                     LOGGER.info(bills[0]);
-                    LOGGER.info("-----------bills-------------");
-                    LOGGER.info(bills);
+                    LOGGER.info("-----------bills[0].dataValues.attachment.dataValues.id-------------");
+                    LOGGER.info(bills[0].dataValues.attachment.dataValues.id);
                     LOGGER.info("-----------bills[0].dataValues.attachment-------------");
                     LOGGER.info(bills[0].dataValues.attachment);
                     if (bills[0].dataValues.attachment != null) {
