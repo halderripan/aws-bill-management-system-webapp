@@ -269,11 +269,11 @@ module.exports = {
                                 //         })
                                 // })
                                 LOGGER.debug("-------Files-----Datavalues---------debug--------------- ");
-                                LOGGER.debug(files[0].dataValues.key);
+                                LOGGER.debug(files[0].dataValues);
                                 let startDate3 = new Date();
                                 s3.deleteObject({
                                     Bucket: bucket,
-                                    Key: files[0].dataValues.key
+                                    Key: files[0].key
                                 }, function (err09) {
                                     let endDate3 = new Date();
                                     let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
