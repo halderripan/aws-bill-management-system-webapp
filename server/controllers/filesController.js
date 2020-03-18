@@ -84,6 +84,7 @@ const { validationResult } = require('express-validator');
 module.exports = {
 
     createFile(req, res) {
+        LOGGER.info("Entering into Create File");
         let startDate = new Date();
         client.increment('createFile');
         const errors = validationResult(req)
@@ -107,16 +108,19 @@ module.exports = {
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
+                        LOGGER.error({ message: "Bill Not Found!" });
                         return res.status(404).send({
                             message: "Bill Not Found!"
                         })
                     }
                     else if (bills[0].dataValues.owner_id != user.dataValues.id) {
+                        LOGGER.error({ message: "User not authorized to add attachment to this Bill!" });
                         return res.status(401).send({
                             message: "User not authorized to add attachment to this Bill!"
                         })
                     }
                     else if (bills[0].dataValues.attachment != null) {
+                        LOGGER.error({ message: "First delete the attachment to the bill before adding a new one!" });
                         return res.status(400).send({
                             message: "First delete the attachment to the bill before adding a new one!"
                         })
@@ -127,13 +131,13 @@ module.exports = {
                         let startDate3 = new Date();
                         uploadS3(req, res, function (err) {
                             let endDate3 = new Date();
-                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) ;
+                            let seconds3 = (endDate3.getTime() - startDate3.getTime());
                             client.timing('createFile_S3UploadTime', seconds3);
                             if (err) {
+                                LOGGER.error({ message: err });
                                 return res.status(400).send(err);
                             } else {
-                                console.log("-----------------------------------------------------------------------")
-                                console.log(req.file);
+                                LOGGER.info("Successfully Uploaded to S3");
 
                                 let startDate2 = new Date();
                                 return File
@@ -150,7 +154,7 @@ module.exports = {
                                     })
                                     .then((file) => {
                                         let endDate2 = new Date();
-                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                                        let seconds2 = (endDate2.getTime() - startDate2.getTime());
                                         client.timing('createFile_DBQueryTime', seconds2);
                                         delete file.dataValues.createdAt;
                                         delete file.dataValues.updatedAt;
@@ -169,37 +173,43 @@ module.exports = {
                                                 }
                                             )
                                         let endDate = new Date();
-                                        let seconds = (endDate.getTime() - startDate.getTime()) ;
+                                        let seconds = (endDate.getTime() - startDate.getTime());
                                         client.timing('successfulUserFetch_APICallTime', seconds);
+                                        LOGGER.info("Exiting from Create File")
                                         res.status(201).send(file);
                                     })
-                                    .catch((error) => {
-                                        res.status(400).send(error);
+                                    .catch((error1) => {
+                                        LOGGER.error({ error: error1 })
+                                        res.status(400).send(error1);
                                     });
                             }
                         });
                     }
                 })
-                .catch((error) => {
-                    if (error.parent.file == "uuid.c") {
+                .catch((error2) => {
+                    if (error2.parent.file == "uuid.c") {
+                        LOGGER.error({ message: "Invalid Bill Id type: UUID/V4 Passed!" })
                         res.status(400).send({
                             message: "Invalid Bill Id type: UUID/V4 Passed!"
                         })
                     }
+                    LOGGER.error({ message: "Bill Not Found!" })
                     res.status(400).send({
                         message: "Bill Not Found!"
                     })
                 });
         })
-            .catch((error) => {
+            .catch((error3) => {
+                LOGGER.error({ error: error3 })
                 res.status(400).send({
-                    error: error
+                    error: error3
                 })
             });
 
     },
 
     getFile(req, res) {
+        LOGGER.info("Entering into Get File");
         let startDate = new Date();
         client.increment('getFile');
         const errors = validationResult(req)
@@ -223,11 +233,13 @@ module.exports = {
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
+                        LOGGER.error({ message: "Bill Not Found!" })
                         return res.status(404).send({
                             message: "Bill Not Found!"
                         })
                     }
                     else if (bills[0].dataValues.owner_id != user.dataValues.id) {
+                        LOGGER.error({ message: "User not authorized to add attachment to this Bill!" })
                         return res.status(401).send({
                             message: "User not authorized to add attachment to this Bill!"
                         })
@@ -242,7 +254,7 @@ module.exports = {
                             })
                             .then((file) => {
                                 let endDate2 = new Date();
-                                let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                                let seconds2 = (endDate2.getTime() - startDate2.getTime());
                                 client.timing('getFile_DBQueryTime', seconds2);
                                 if (file.length == 0) {
                                     return res.status(404).send({
@@ -261,41 +273,49 @@ module.exports = {
                                 delete file[0].dataValues.bill;
                                 delete file[0].dataValues.md5;
                                 delete file[0].dataValues.key;
-                                let endDate   = new Date();
-                                let seconds = (endDate.getTime() - startDate.getTime()) ;
+                                let endDate = new Date();
+                                let seconds = (endDate.getTime() - startDate.getTime());
                                 client.timing('successfulUserFetch_APICallTime', seconds);
+                                LOGGER.info("Exiting from Get File");
                                 res.status(200).send(file[0]);
                             })
-                            .catch((error) => {
-                                if (error.parent.file == "uuid.c") {
+                            .catch((error11) => {
+                                if (error11.parent.file == "uuid.c") {
+
+                                    LOGGER.error({ message: "Invalid File Id type: UUID/V4 Passed!" })
                                     res.status(400).send({
                                         message: "Invalid File Id type: UUID/V4 Passed!"
                                     })
                                 }
-                                res.status(400).send(error);
+                                LOGGER.error({ error: error11 });
+                                res.status(400).send(error11);
                             });
                     }
                 })
-                .catch((error) => {
-                    if (error.parent.file == "uuid.c") {
+                .catch((error12) => {
+                    if (error12.parent.file == "uuid.c") {
+                        LOGGER.error({ message: "Invalid File Id type: UUID/V4 Passed!" })
                         res.status(400).send({
                             message: "Invalid Bill Id type: UUID/V4 Passed!"
                         })
                     }
+                    LOGGER.error({ message: "Bill Not Found!" })
                     res.status(400).send({
                         message: "Bill Not Found!"
                     })
                 });
         })
-            .catch((error) => {
+            .catch((error13) => {
+                LOGGER.error({error: error13});
                 res.status(400).send({
-                    error: error
+                    error: error13
                 })
             });
 
     },
 
     deleteFile(req, res) {
+        LOGGER.info("Entering into Delete File");
         let startDate = new Date();
         client.increment('deleteFile');
         const errors = validationResult(req)
@@ -318,11 +338,13 @@ module.exports = {
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
+                        LOGGER.error({message: "Bill Not Found!"});
                         return res.status(404).send({
                             message: "Bill Not Found!"
                         })
                     }
                     else if (bills[0].dataValues.owner_id != user.dataValues.id) {
+                        LOGGER.error({message: "User not authorized to add attachment to this Bill!"});
                         return res.status(401).send({
                             message: "User not authorized to add attachment to this Bill!"
                         })
@@ -346,7 +368,7 @@ module.exports = {
                                     })
                                     .then((file) => {
                                         let endDate2 = new Date();
-                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                                        let seconds2 = (endDate2.getTime() - startDate2.getTime());
                                         client.timing('deleteFile_DBQueryTime', seconds2);
                                         if (file.length == 0) {
                                             return res.status(404).send({
@@ -354,6 +376,7 @@ module.exports = {
                                             })
                                         }
                                         if (file[0].bill != req.params.billId) {
+                                            LOGGER.error({message: "File for this Bill Not Found!"});
                                             return res.status(404).send({
                                                 message: "File for this Bill Not Found!"
                                             })
@@ -364,9 +387,10 @@ module.exports = {
                                             Key: file[0].key
                                         }, function (err09) {
                                             let endDate3 = new Date();
-                                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) ;
+                                            let seconds3 = (endDate3.getTime() - startDate3.getTime());
                                             client.timing('deleteFile_S3Time', seconds3);
                                             if (err09) {
+                                                LOGGER.error({message: "Error while deleting from S3!"});
                                                 return res.status(400).send({
                                                     message: "Error while deleting from S3!"
                                                 })
@@ -379,46 +403,54 @@ module.exports = {
                                                     })
                                                     .then((rowDeleted) => {
                                                         if (rowDeleted === 1) {
-                                                            let endDate   = new Date();
-                                                            let seconds = (endDate.getTime() - startDate.getTime()) ;
+                                                            let endDate = new Date();
+                                                            let seconds = (endDate.getTime() - startDate.getTime());
                                                             client.timing('successfulUserFetch_APICallTime', seconds);
+                                                            LOGGER.info("Exiting from delete File");
                                                             res.status(204).send('Deleted successfully');
                                                         }
                                                     })
                                                     .catch((error2) => {
+                                                        LOGGER.error({error: error2});
                                                         res.status(400).send(error2);
                                                     });
                                             }
                                         });
                                     })
-                                    .catch((error) => {
-                                        if (error.parent.file == "uuid.c") {
+                                    .catch((error15) => {
+                                        if (error15.parent.file == "uuid.c") {
+                                            LOGGER.error({message: "Invalid File Id type: UUID/V4 Passed!"});
                                             res.status(400).send({
                                                 message: "Invalid File Id type: UUID/V4 Passed!"
                                             })
                                         }
-                                        res.status(400).send(error);
+                                        LOGGER.error({error : error15});
+                                        res.status(400).send(error15);
                                     });
                             })
                             .catch((error1) => {
+                                LOGGER.error({error : error1});
                                 res.status(400).send(error1);
                             })
                     }
                 })
                 .catch((error) => {
                     if (error.parent.file == "uuid.c") {
+                        LOGGER.error({message: "Invalid Bill Id type: UUID/V4 Passed!"});
                         res.status(400).send({
                             message: "Invalid Bill Id type: UUID/V4 Passed!"
                         })
                     }
+                    LOGGER.error({message: "Bill Not Found!"});
                     res.status(400).send({
                         message: "Bill Not Found!"
                     })
                 });
         })
-            .catch((error) => {
+            .catch((error17) => {
+                LOGGER.error({error:error17})
                 res.status(400).send({
-                    error: error
+                    error: error17
                 })
             });
 
@@ -430,6 +462,7 @@ module.exports = {
 const realm = 'Basic Authentication';
 
 function authenticationStatus(resp) {
+    LOGGER.error("Basic Authorization is needed! Please provide Username and Password!");
     resp.writeHead(401, { 'WWW-Authenticate': 'Basic realm="' + realm + '"' });
     resp.end('Basic Authorization is needed! Please provide Username and Password!');
 };
@@ -441,6 +474,7 @@ const authorizeAnUser = function (req, res) {
         const loginInfo = authentication.split(':');
         const userName = loginInfo[0];
         const passwordFromToken = loginInfo[1];
+        LOGGER.info("Authorizing the user : " + userName);
 
         User
             .findAll({
@@ -452,6 +486,9 @@ const authorizeAnUser = function (req, res) {
             .then((user) => {
                 if (user.length == 0) {
                     reject(Error("Invalid Username!"));
+                    LOGGER.error({
+                        message: 'User Not Found! Invalid Username!'
+                    });
                     return res.status(404).send({
                         message: 'User Not Found! Invalid Username!',
                     });
@@ -459,6 +496,9 @@ const authorizeAnUser = function (req, res) {
                 bcrypt.compare(passwordFromToken, user[0].dataValues.password, function (err, res2) {
                     if (err) {
                         reject(Error("Passwords Error!"));
+                        LOGGER.error({
+                            message: 'Error occured while comparing passwords.'
+                        });
                         return res.status(400).send({
                             message: 'Error occured while comparing passwords.'
                         })
@@ -467,6 +507,7 @@ const authorizeAnUser = function (req, res) {
                         resolve(user[0]);
                     } else {
                         reject(Error(`Wrong Passwords!`));
+                        LOGGER.error({ success: false, message: 'Unauthorized! Wrong Password!' });
                         return res.status(401).json({ success: false, message: 'Unauthorized! Wrong Password!' });
                     }
                 });
