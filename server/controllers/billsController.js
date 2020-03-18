@@ -279,7 +279,7 @@ module.exports = {
                                     let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
                                     sdc.timing('deleteFile_S3Time', seconds3);
                                     if (err09) {
-                                        LOGGER.error("--------------S3 Delete Error:-------- :: err09 : "+ err09);
+                                        LOGGER.error("--------------S3 Delete Error:-------- :: err09 : " + err09);
                                         return res.status(400).send({
                                             message: "Error while deleting from S3!"
                                         })
@@ -294,41 +294,64 @@ module.exports = {
                                             })
                                             .then((rowDeleted) => {
                                                 LOGGER.debug("--------------File Deleted Successfully-------- ");
+                                                let startDate2 = new Date();
+                                                return Bill
+                                                    .destroy({
+                                                        where: {
+                                                            id: req.params.id
+                                                        }
+                                                    })
+                                                    .then((rowDeleted) => {
+                                                        let endDate2 = new Date();
+                                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                                        sdc.timing('deleteBillByID_DBQueryTime', seconds2);
+                                                        if (rowDeleted === 1) {
+                                                            let endDate = new Date();
+                                                            let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                                            sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
+                                                            res.status(204).send('Deleted successfully');
+                                                        }
+                                                    })
+                                                    .catch((e) => res.status(400).send({
+                                                        message: "Some Error Occured While Deleting!",
+                                                        error: e
+                                                    }))
                                             })
                                             .catch((error2) => {
-                                                LOGGER.error("--------------File Deleted Error:-------- :: error2 : "+ error2);
+                                                LOGGER.error("--------------File Deleted Error:-------- :: error2 : " + error2);
                                                 res.status(400).send(error2);
                                             });
                                     }
                                 })
                             })
                             .catch((error10) => {
-                                LOGGER.error("--------------File Find Error:-------- :: error10 : "+ error10);
+                                LOGGER.error("--------------File Find Error:-------- :: error10 : " + error10);
                                 res.status(400).send(error10);
                             });
+                    } else {
+                        let startDate2 = new Date();
+                        return Bill
+                            .destroy({
+                                where: {
+                                    id: req.params.id
+                                }
+                            })
+                            .then((rowDeleted) => {
+                                let endDate2 = new Date();
+                                let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                sdc.timing('deleteBillByID_DBQueryTime', seconds2);
+                                if (rowDeleted === 1) {
+                                    let endDate = new Date();
+                                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                    sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
+                                    res.status(204).send('Deleted successfully');
+                                }
+                            })
+                            .catch((e) => res.status(400).send({
+                                message: "Some Error Occured While Deleting!",
+                                error: e
+                            }))
                     }
-                    let startDate2 = new Date();
-                    return Bill
-                        .destroy({
-                            where: {
-                                id: req.params.id
-                            }
-                        })
-                        .then((rowDeleted) => {
-                            let endDate2 = new Date();
-                            let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
-                            sdc.timing('deleteBillByID_DBQueryTime', seconds2);
-                            if (rowDeleted === 1) {
-                                let endDate = new Date();
-                                let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-                                sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
-                                res.status(204).send('Deleted successfully');
-                            }
-                        })
-                        .catch((e) => res.status(400).send({
-                            message: "Some Error Occured While Deleting!",
-                            error: e
-                        }))
                 })
                 .catch((error) => {
                     if (error.parent.file == "uuid.c") {
