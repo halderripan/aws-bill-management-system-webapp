@@ -268,27 +268,24 @@ module.exports = {
                                 //             }
                                 //         })
                                 // })
-                                LOGGER.info("-------Files-----Datavalues------------------------ ");
-                                LOGGER.info(files[0].dataValues.key);
-                                LOGGER.info("-------Files------Key----------------------- ");
-                                LOGGER.info(files[0].key);
                                 LOGGER.debug("-------Files-----Datavalues---------debug--------------- ");
                                 LOGGER.debug(files[0].dataValues.key);
-                                LOGGER.debug("-------Files------Key------------debug----------- ");
-                                LOGGER.debug(files[0].key);
                                 let startDate3 = new Date();
                                 s3.deleteObject({
                                     Bucket: bucket,
-                                    Key: files[0].key
+                                    Key: files[0].dataValues.key
                                 }, function (err09) {
                                     let endDate3 = new Date();
                                     let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
-                                    sdc.timing('deleteFile_DBQueryTime', seconds3);
+                                    sdc.timing('deleteFile_S3Time', seconds3);
                                     if (err09) {
+                                        LOGGER.error("--------------S3 Delete Error:-------- :: err09 : "+ err09);
                                         return res.status(400).send({
                                             message: "Error while deleting from S3!"
                                         })
                                     } else {
+                                        LOGGER.debug("--------------Deleting File-------- ");
+                                        LOGGER.debug(files[0].dataValues.key);
                                         return File
                                             .destroy({
                                                 where: {
@@ -296,17 +293,17 @@ module.exports = {
                                                 }
                                             })
                                             .then((rowDeleted) => {
-                                                if (rowDeleted === 1) {
-                                                    res.status(204).send('Deleted successfully');
-                                                }
+                                                LOGGER.debug("--------------File Deleted Successfully-------- ");
                                             })
                                             .catch((error2) => {
+                                                LOGGER.error("--------------File Deleted Error:-------- :: error2 : "+ error2);
                                                 res.status(400).send(error2);
                                             });
                                     }
                                 })
                             })
                             .catch((error10) => {
+                                LOGGER.error("--------------File Find Error:-------- :: error10 : "+ error10);
                                 res.status(400).send(error10);
                             });
                     }
