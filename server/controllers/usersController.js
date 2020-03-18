@@ -22,7 +22,7 @@ module.exports = {
   //Creating a new User
   createUser(req, res) {
     var startDate = new Date();
-    client.increment('createUser');
+    client.increment('createUser', 1);
     LOGGER.info("Creating a  User!");
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -89,7 +89,7 @@ module.exports = {
 
   updateUser(req, res) {
     var startDate = new Date();
-    client.increment('updateUser');
+    client.increment('updateUser', 1);
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -164,7 +164,7 @@ module.exports = {
 
   getUser(req, res) {
     var startDate = new Date();
-    client.increment('getUser');
+    client.increment('getUser', 1);
 
     if (!req.headers.authorization) {
       authenticationStatus(res);
