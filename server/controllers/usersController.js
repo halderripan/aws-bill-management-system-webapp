@@ -13,13 +13,21 @@ const bcrypt = require(`bcrypt`);
 const uuidv4 = require('uuid/v4');
 
 const { validationResult } = require('express-validator');
+//Logger
+const LOGGER = require("../logger/logger.js");
+const StatsD = require('node-statsd'), client = new StatsD();
 
 module.exports = {
 
   //Creating a new User
   createUser(req, res) {
+    LOGGER.info("Entering into Create User");
+    let startDate = new Date();
+    client.increment('createUser', 1);
+    LOGGER.info("Creating a  User!");
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
+      LOGGER.error({ errors: errors.array() });
       return res.status(400).json({ errors: errors.array() })
     }
     return User
@@ -31,6 +39,7 @@ module.exports = {
       })
       .then(user => {
         if (user.length > 0) {
+          LOGGER.error({ message: "User already exists! Provide a different email_address / username!" });
           return res.status(400).send({
             message: `User already exists! Provide a different email_address / username!`,
           });
@@ -41,6 +50,7 @@ module.exports = {
           let flag = passwordCheck(res, pwd);
 
           if (!flag) {
+            let startDate2 = new Date();
             return User
               .create({
                 id: uuidv4(),
@@ -50,18 +60,31 @@ module.exports = {
                 password: hash
               })
               .then((user) => {
+                let endDate2 = new Date();
+                let seconds2 = (endDate2.getTime() - startDate2.getTime());
+                client.timing('createUser_DBQueryTime', seconds2);
                 delete user.dataValues.password;
                 user.dataValues.account_created = user.dataValues.createdAt;
                 user.dataValues.account_updated = user.dataValues.updatedAt;
                 delete user.dataValues.createdAt;
                 delete user.dataValues.updatedAt;
+                let endDate = new Date();
+                let seconds = (endDate.getTime() - startDate.getTime());
+                client.timing('successfulUserCreation_APICallTime', seconds);
+                LOGGER.info("User Created. Exiting form Create User!");
                 res.status(201).send(user)
               })
-              .catch((error) => res.status(400).send(error));
+              .catch((error21) => {
+                LOGGER.error({ error: error21 });
+                res.status(400).send(error21)
+              });
           }
         })
       })
-      .catch((error) => res.status(400).send(error));
+      .catch((error22) => {
+        LOGGER.error({ error: error22 });
+        res.status(400).send(error22)
+      });
   },
 
   // Fetching all users. No authentication
@@ -78,8 +101,11 @@ module.exports = {
   },
 
   updateUser(req, res) {
+    let startDate = new Date();
+    client.increment('updateUser', 1);
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
+      LOGGER.error({ errors: errors.array() });
       return res.status(400).json({ errors: errors.array() })
     }
 
@@ -103,18 +129,21 @@ module.exports = {
       })
       .then((user) => {
         if (user.length == 0) {
+          LOGGER.error({ message: 'User Not Found! Invalid Username!' });
           return res.status(404).send({
             message: 'User Not Found! Invalid Username!',
           });
         }
         bcrypt.compare(passwordFromToken, user[0].dataValues.password, function (err, res2) {
           if (err) {
+            LOGGER.error({ message: 'Error occured while comparing passwords.' });
             return res.status(400).send({
               message: 'Error occured while comparing passwords.'
             })
           }
           if (res2) {
             if (req.body.email_address != user[0].dataValues.email_address) {
+              LOGGER.error({ message: `Invalid Request! Can't change username / email_address.` });
               return res.status(400).send({
                 message: `Invalid Request! Can't change username / email_address.`
               })
@@ -122,6 +151,7 @@ module.exports = {
             bcrypt.hash(req.body.password, 5).then(function (hash) {
               let flag = passwordCheck(res, req.body.password);
               if (!flag) {
+                let startDate2 = new Date();
                 return User
                   .update({
                     first_name: req.body.first_name,
@@ -131,20 +161,39 @@ module.exports = {
                     {
                       where: { email_address: userName }
                     })
-                  .then((user) => res.status(204).send("Updated Successfully!"))
-                  .catch((error) => res.status(400).send(error));
+                  .then((user) => {
+                    let endDate2 = new Date();
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime());
+                    client.timing('updateUser_DBQueryTime', seconds2);
+                    let endDate = new Date();
+                    let seconds = (endDate.getTime() - startDate.getTime());
+                    client.timing('successfulUserUpdation_APICallTime', seconds);
+                    res.status(204).send("Updated Successfully!")
+                  })
+                  .catch((error31) => {
+
+                    LOGGER.error({ error: error31 });
+                    res.status(400).send(error31);
+                  });
               }
             })
 
           } else {
+            LOGGER.error({ success: false, message: 'Unauthorized! Wrong Password!' });
             return res.status(401).json({ success: false, message: 'Unauthorized! Wrong Password!' });
           }
         });
       })
-      .catch((error) => res.status(400).send(error));
+      .catch((error32) => {
+        LOGGER.error({ error: error32 });
+        res.status(400).send(error32)
+      });
   },
 
   getUser(req, res) {
+    LOGGER.info("Entering into Get User");
+    let startDate = new Date();
+    client.increment('getUser', 1);
 
     if (!req.headers.authorization) {
       authenticationStatus(res);
@@ -157,6 +206,7 @@ module.exports = {
     const userName = loginInfo[0];
     const passwordFromToken = loginInfo[1];
 
+    let startDate2 = new Date();
     return User
       .findAll({
         limit: 1,
@@ -165,13 +215,18 @@ module.exports = {
         },
       })
       .then((user) => {
+        let endDate2 = new Date();
+        let seconds2 = (endDate2.getTime() - startDate2.getTime());
+        client.timing('getUser_DBQueryTime', seconds2);
         if (user.length == 0) {
+          LOGGER.error({ message: 'User Not Found! Invalid Username!' });
           return res.status(404).send({
             message: 'User Not Found! Invalid Username!',
           });
         }
         bcrypt.compare(passwordFromToken, user[0].dataValues.password, function (err, res2) {
           if (err) {
+            LOGGER.error({ message: 'Error occured while comparing passwords.' });
             return res.status(400).send({
               message: 'Error occured while comparing passwords.'
             })
@@ -182,20 +237,30 @@ module.exports = {
             user[0].dataValues.account_updated = user[0].dataValues.updatedAt;
             delete user[0].dataValues.createdAt;
             delete user[0].dataValues.updatedAt;
+
+            let endDate = new Date();
+            let seconds = (endDate.getTime() - startDate.getTime());
+            client.timing('successfulUserFetch_APICallTime', seconds);
+            LOGGER.info("Exiting from GET User");
             res.status(200).send(user[0]);
 
           } else {
+            LOGGER.error({ success: false, message: 'Unauthorized! Wrong Password!' });
             return res.status(401).json({ success: false, message: 'Unauthorized! Wrong Password!' });
           }
         });
       })
-      .catch((error) => res.status(400).send(error));
+      .catch((error41) => {
+        LOGGER.error({error : error41});
+        res.status(400).send(error41)
+      });
   }
 };
 
 const realm = 'Basic Authentication';
 
 function authenticationStatus(resp) {
+  LOGGER.error("Basic Authorization is needed! Please provide Username and Password!");
   resp.writeHead(401, { 'WWW-Authenticate': 'Basic realm="' + realm + '"' });
   resp.end('Basic Authorization is needed! Please provide Username and Password!');
 };

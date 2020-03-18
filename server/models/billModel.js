@@ -6,7 +6,7 @@
  */
 const Sequelize = require('sequelize');
 const sequelize = require("../modules/applicationPropertiesSingleton.js").sequelize;
-var Bill = sequelize.define('bill', {
+let Bill = sequelize.define('bill', {
     id: {
         allowNull: false,
         primaryKey: true,

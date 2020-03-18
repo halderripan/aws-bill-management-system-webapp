@@ -1,4 +1,4 @@
-var Sequelize = require('sequelize');
+let Sequelize = require('sequelize');
 const { Pool, Client } = require('pg');
 
 const username = process.env.DB_USERNAME;
@@ -12,7 +12,7 @@ const port = process.env.DB_PORT;
 // const host = 'localhost';
 // const dbName = 'cloudassignment';
 // const port = 5432;
-var sequelize = new Sequelize(dbName, username, password,
+let sequelize = new Sequelize(dbName, username, password,
     {
         host: host,
         port: port,

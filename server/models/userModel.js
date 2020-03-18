@@ -7,7 +7,7 @@
 
 const Sequelize = require('sequelize');
 const sequelize = require("../modules/applicationPropertiesSingleton.js").sequelize;
-var User = sequelize.define('users', {
+let User = sequelize.define('users', {
     id: {
         allowNull: false,
         primaryKey: true,
