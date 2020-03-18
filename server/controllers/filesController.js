@@ -122,7 +122,11 @@ module.exports = {
                     else {
 
                         console.log("----------- REGION  ------------ " + aws.config.region);
+                        let startDate3 = new Date();
                         uploadS3(req, res, function (err) {
+                            let endDate3 = new Date();
+                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
+                            client.timing('deleteFile_DBQueryTime', seconds3);
                             if (err) {
                                 return res.status(400).send(err);
                             } else {
@@ -348,10 +352,14 @@ module.exports = {
                                                 message: "File for this Bill Not Found!"
                                             })
                                         }
+                                        let startDate3 = new Date();
                                         s3.deleteObject({
                                             Bucket: bucket,
                                             Key: file[0].key
                                         }, function (err09) {
+                                            let endDate3 = new Date();
+                                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
+                                            client.timing('deleteFile_DBQueryTime', seconds3);
                                             if (err09) {
                                                 return res.status(400).send({
                                                     message: "Error while deleting from S3!"

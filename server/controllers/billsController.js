@@ -257,10 +257,14 @@ module.exports = {
                                 LOGGER.debug(files[0].dataValues.key);
                                 LOGGER.debug("-------Files------Key----------------------- ");
                                 LOGGER.debug(files[0].key);
+                                let startDate3 = new Date();
                                 s3.deleteObject({
                                     Bucket: bucket,
                                     Key: files[0].key
                                 }, function (err09) {
+                                    let endDate3 = new Date();
+                                    let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
+                                    client.timing('deleteFile_DBQueryTime', seconds3);
                                     if (err09) {
                                         return res.status(400).send({
                                             message: "Error while deleting from S3!"
