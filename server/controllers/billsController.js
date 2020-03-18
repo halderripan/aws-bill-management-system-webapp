@@ -24,7 +24,7 @@ const s3 = new aws.S3({ apiVersion: '2006-03-01' });
 const bucket = process.env.S3_BUCKET;
 //Logger
 const LOGGER = require("../logger/logger.js");
-const SDC = require('statsd-client'),
+const SDC = require('statsd-client');
 const sdc = new SDC({host: 'localhost', port: 8125});
 
 module.exports = {
