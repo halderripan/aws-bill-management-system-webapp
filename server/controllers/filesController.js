@@ -88,6 +88,7 @@ module.exports = {
         client.increment('createFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.error({ errors: errors.array() });
             return res.status(400).json({ errors: errors.array() })
         }
 
@@ -203,6 +204,7 @@ module.exports = {
         client.increment('getFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.error({ errors: errors.array() });
             return res.status(400).json({ errors: errors.array() })
         }
 
@@ -298,6 +300,7 @@ module.exports = {
         client.increment('deleteFile');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.error({ errors: errors.array() });
             return res.status(400).json({ errors: errors.array() })
         }
         if (!req.headers.authorization) {

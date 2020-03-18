@@ -209,6 +209,7 @@ module.exports = {
                     let endDate = new Date();
                     let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
                     sdc.timing('successfulGetAllBills_APICallTime', seconds);
+                    LOGGER.info("All Bills Fetched!");
                     return res.status(200).send(bills);
                 })
                 .catch((error) => res.status(400).send({
@@ -226,6 +227,7 @@ module.exports = {
         sdc.increment('deleteBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.error({ errors: errors.array() });
             return res.status(400).json({ errors: errors.array() })
         }
 
@@ -280,7 +282,6 @@ module.exports = {
                                         })
                                     } else {
                                         LOGGER.debug("--------------Deleting File-------- ");
-                                        LOGGER.debug(files[0].dataValues.key);
                                         return File
                                             .destroy({
                                                 where: {
@@ -304,13 +305,17 @@ module.exports = {
                                                             let endDate = new Date();
                                                             let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
                                                             sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
+                                                            LOGGER.info("Bill Deleted Successfuuly");
                                                             res.status(204).send('Deleted successfully');
                                                         }
                                                     })
-                                                    .catch((e) => res.status(400).send({
-                                                        message: "Some Error Occured While Deleting!",
-                                                        error: e
-                                                    }))
+                                                    .catch((e) => {
+                                                        LOGGER.error({ "Error": e })
+                                                        res.status(400).send({
+                                                            message: "Some Error Occured While Deleting!",
+                                                            error: e
+                                                        })
+                                                    })
                                             })
                                             .catch((error2) => {
                                                 LOGGER.error("--------------File Deleted Error:-------- :: error2 : " + error2);
@@ -339,6 +344,7 @@ module.exports = {
                                     let endDate = new Date();
                                     let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
                                     sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
+                                    LOGGER.info("Bill Deleted Successfuuly");
                                     res.status(204).send('Deleted successfully');
                                 }
                             })
@@ -349,6 +355,7 @@ module.exports = {
                     }
                 })
                 .catch((error) => {
+                    LOGGER.error({ "Error": error });
                     if (error.parent.file == "uuid.c") {
                         res.status(400).send({
                             message: "Invalid Bill Id type: UUID/V4 Passed!"
@@ -359,16 +366,19 @@ module.exports = {
                     })
                 });
         })
-            .catch((error) => {
-                res.status(400).send(error);
+            .catch((error100) => {
+                LOGGER.error({ "Error": error100 });
+                res.status(400).send(error100);
             });
     },
 
     updateBillByID(req, res) {
+        LOGGER.info("Entering into Update Bill By ID");
         let startDate = new Date();
         sdc.increment('updateBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.error({ errors: errors.array() });
             return res.status(400).json({ errors: errors.array() })
         }
 
@@ -387,11 +397,13 @@ module.exports = {
                 })
                 .then((bills) => {
                     if (bills.length == 0) {
+                        LOGGER.error({ message: "Bill Not Found!" });
                         return res.status(404).send({
                             message: "Bill Not Found!"
                         })
                     }
                     else if (bills[0].dataValues.owner_id != user.dataValues.id) {
+                        LOGGER.error({ message: "User not authorized to update this Bill!" });
                         return res.status(401).send({
                             message: "User not authorized to update this Bill!"
                         })
@@ -431,34 +443,43 @@ module.exports = {
                                     let endDate = new Date();
                                     let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
                                     sdc.timing('successfulUpdateBillByID_APICallTime', seconds);
+                                    LOGGER.info("Successfully Updated a Bill By ID");
                                     return res.status(200).send(bills[0]);
                                 })
-                                .catch((error) => res.status(400).send({
-                                    message: "Bill not found!"
-                                }));
-                        })
-                        .catch((error) => {
-                            if (error.errors[0].value == "Invalid date") {
-                                res.status(400).send({
-                                    message: "Invalid Date!"
+                                .catch((error7) => {
+                                    LOGGER.error({ message: "Bill not found!", error: error7 });
+                                    res.status(400).send({
+                                        message: "Bill not found!", error: error7
+                                    })
                                 });
-                            }
-                            res.status(400).send("Something Unexpected Happened while updating!")
+                        })
+                        .catch((error101) => {
+                            // if (error.errors[0].value == "Invalid date") {
+                            //     res.status(400).send({
+                            //         message: "Invalid Date!"
+                            //     });
+                            // }
+
+                            LOGGER.error({ message: "Something Unexpected Happened while updating Bill!", error: error101 });
+                            res.status(400).send({ message: "Something Unexpected Happened while updating Bill!", error: error101 })
                         });
                 })
                 .catch((error) => {
                     if (error.parent.file == "uuid.c") {
+                        LOGGER.error({ message: "Invalid Bill Id type: UUID/V4 Passed!" });
                         res.status(400).send({
                             message: "Invalid Bill Id type: UUID/V4 Passed!"
                         })
                     }
+                    LOGGER.error({ message: "Bill Not Found!" });
                     res.status(400).send({
                         message: "Bill Not Found!"
                     })
                 });
         })
-            .catch((error) => {
-                res.status(400).send(error);
+            .catch((error12) => {
+                LOGGER.error({ error: error12 });
+                res.status(400).send(error12);
             });
     }
 }
@@ -488,6 +509,9 @@ const authorizeAnUser = function (req, res) {
             .then((user) => {
                 if (user.length == 0) {
                     reject(Error("Invalid Username!"));
+                    LOGGER.error({
+                        message: 'User Not Found! Invalid Username!'
+                    });
                     return res.status(404).send({
                         message: 'User Not Found! Invalid Username!',
                     });
@@ -495,6 +519,9 @@ const authorizeAnUser = function (req, res) {
                 bcrypt.compare(passwordFromToken, user[0].dataValues.password, function (err, res2) {
                     if (err) {
                         reject(Error("Passwords Error!"));
+                        LOGGER.error({
+                            message: 'Error occured while comparing passwords.'
+                        });
                         return res.status(400).send({
                             message: 'Error occured while comparing passwords.'
                         })
@@ -503,6 +530,7 @@ const authorizeAnUser = function (req, res) {
                         resolve(user[0]);
                     } else {
                         reject(Error(`Wrong Passwords!`));
+                        LOGGER.error({ success: false, message: 'Unauthorized! Wrong Password!' });
                         return res.status(401).json({ success: false, message: 'Unauthorized! Wrong Password!' });
                     }
                 });
