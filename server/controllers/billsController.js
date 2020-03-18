@@ -44,13 +44,13 @@ module.exports = {
             return;
         }
         authorizeAnUser(req, res).then(function (user) {
-            LOGGER.info("User Authorized! :: "+ FileName);
+            LOGGER.info("User Authorized! :: " + FileName);
             billData = req.body;
             billData.id = uuidv4();
             billData.owner_id = user.id;
             let startDate2 = new Date();
 
-            LOGGER.info("startDate2 = "+startDate2+" :: "+ FileName);
+            LOGGER.info("startDate2 = " + startDate2 + " :: " + FileName);
             return Bill
                 .create(billData)
                 .then((bill) => {
@@ -73,12 +73,12 @@ module.exports = {
                             message: "Invalid Date!"
                         });
                     }
-                    LOGGER.error("Error Occured in createBill :: " + FileName + " :: error1 : "+ error1);
+                    LOGGER.error("Error Occured in createBill :: " + FileName + " :: error1 : " + error1);
                     res.status(400).send(error1);
                 });
         })
             .catch((error) => {
-                LOGGER.error("Error Occured in createBill :: " + FileName + " :: error : "+ error);
+                LOGGER.error("Error Occured in createBill :: " + FileName + " :: error : " + error);
                 res.status(400).send(error);
             });
     },
@@ -210,6 +210,7 @@ module.exports = {
     },
 
     deleteBillByID(req, res) {
+        LOGGER.info("Entering Delete Bill By ID");
         let startDate = new Date();
         sdc.increment('deleteBillByID');
         const errors = validationResult(req)
@@ -241,6 +242,8 @@ module.exports = {
                         })
                     }
                     if (bills[0].dataValues.attachment != null) {
+
+                        LOGGER.info("Bill Has Some Attachments");
                         File
                             .findAll({
                                 where: {
@@ -260,6 +263,10 @@ module.exports = {
                                 LOGGER.info(files[0].dataValues.key);
                                 LOGGER.info("-------Files------Key----------------------- ");
                                 LOGGER.info(files[0].key);
+                                LOGGER.debug("-------Files-----Datavalues---------debug--------------- ");
+                                LOGGER.debug(files[0].dataValues.key);
+                                LOGGER.debug("-------Files------Key------------debug----------- ");
+                                LOGGER.debug(files[0].key);
                                 let startDate3 = new Date();
                                 s3.deleteObject({
                                     Bucket: bucket,
