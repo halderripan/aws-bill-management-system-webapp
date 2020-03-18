@@ -253,10 +253,10 @@ module.exports = {
                                 //             }
                                 //         })
                                 // })
-                                LOGGER.debug("-------Files-----Datavalues------------------------ ");
-                                LOGGER.debug(files[0].dataValues.key);
-                                LOGGER.debug("-------Files------Key----------------------- ");
-                                LOGGER.debug(files[0].key);
+                                LOGGER.info("-------Files-----Datavalues------------------------ ");
+                                LOGGER.info(files[0].dataValues.key);
+                                LOGGER.info("-------Files------Key----------------------- ");
+                                LOGGER.info(files[0].key);
                                 let startDate3 = new Date();
                                 s3.deleteObject({
                                     Bucket: bucket,
