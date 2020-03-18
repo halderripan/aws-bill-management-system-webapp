@@ -57,7 +57,7 @@ module.exports = {
                     LOGGER.info("Bill Created!");
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
-                    client.timing('createBill_DBQueryTime', seconds2);
+                    sdc.timing('createBill_DBQueryTime', seconds2);
                     bill.dataValues.created_ts = bill.dataValues.createdAt;
                     bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                     delete bill.dataValues.createdAt;
@@ -85,7 +85,6 @@ module.exports = {
 
     getBillByID(req, res) {
         let startDate = new Date();
-        // client.increment('getBillByID');
         sdc.increment('getBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -109,7 +108,7 @@ module.exports = {
                 .then((bills) => {
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
-                    client.timing('getBillByID_DBQueryTime', seconds2);
+                    sdc.timing('getBillByID_DBQueryTime', seconds2);
                     if (bills.length == 0) {
                         return res.status(404).send({
                             message: "Bill Not Found!"
@@ -155,7 +154,6 @@ module.exports = {
 
     getAllBills(req, res) {
         let startDate = new Date();
-        // client.increment('getAllBills');
         sdc.increment('getAllBills');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -178,7 +176,7 @@ module.exports = {
                 .then((bills) => {
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
-                    client.timing('getAllBills_DBQueryTime', seconds2);
+                    sdc.timing('getAllBills_DBQueryTime', seconds2);
                     if (bills.length == 0) {
                         return res.status(404).send({
                             message: "No Bills Found!"
@@ -213,7 +211,6 @@ module.exports = {
 
     deleteBillByID(req, res) {
         let startDate = new Date();
-        // client.increment('deleteBillByID');
         sdc.increment('deleteBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -270,7 +267,7 @@ module.exports = {
                                 }, function (err09) {
                                     let endDate3 = new Date();
                                     let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
-                                    client.timing('deleteFile_DBQueryTime', seconds3);
+                                    sdc.timing('deleteFile_DBQueryTime', seconds3);
                                     if (err09) {
                                         return res.status(400).send({
                                             message: "Error while deleting from S3!"
@@ -307,7 +304,7 @@ module.exports = {
                         .then((rowDeleted) => {
                             let endDate2 = new Date();
                             let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
-                            client.timing('deleteBillByID_DBQueryTime', seconds2);
+                            sdc.timing('deleteBillByID_DBQueryTime', seconds2);
                             if (rowDeleted === 1) {
                                 let endDate = new Date();
                                 let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
@@ -338,7 +335,6 @@ module.exports = {
 
     updateBillByID(req, res) {
         let startDate = new Date();
-        // client.increment('updateBillByID');
         sdc.increment('updateBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -387,7 +383,7 @@ module.exports = {
                         .then((resp) => {
                             let endDate2 = new Date();
                             let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
-                            client.timing('updateBillByID_DBQueryTime', seconds2);
+                            sdc.timing('updateBillByID_DBQueryTime', seconds2);
                             return Bill
                                 .findAll({
                                     where: {
