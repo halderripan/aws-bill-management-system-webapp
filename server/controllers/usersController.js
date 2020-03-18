@@ -21,6 +21,7 @@ module.exports = {
 
   //Creating a new User
   createUser(req, res) {
+    var startDate = new Date();
     client.increment('createUser');
     LOGGER.info("Creating a  User!");
     const errors = validationResult(req)
@@ -61,6 +62,9 @@ module.exports = {
                 user.dataValues.account_updated = user.dataValues.updatedAt;
                 delete user.dataValues.createdAt;
                 delete user.dataValues.updatedAt;
+                var endDate = new Date();
+                var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                client.timing('successfulUserCreation_APICallTime', seconds);
                 res.status(201).send(user)
               })
               .catch((error) => res.status(400).send(error));
@@ -84,6 +88,7 @@ module.exports = {
   },
 
   updateUser(req, res) {
+    var startDate = new Date();
     client.increment('updateUser');
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -138,7 +143,13 @@ module.exports = {
                     {
                       where: { email_address: userName }
                     })
-                  .then((user) => res.status(204).send("Updated Successfully!"))
+                  .then((user) => {
+
+                    var endDate = new Date();
+                    var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                    client.timing('successfulUserUpdation_APICallTime', seconds);
+                    res.status(204).send("Updated Successfully!")
+                  })
                   .catch((error) => res.status(400).send(error));
               }
             })
@@ -152,6 +163,7 @@ module.exports = {
   },
 
   getUser(req, res) {
+    var startDate = new Date();
     client.increment('getUser');
 
     if (!req.headers.authorization) {
@@ -190,6 +202,10 @@ module.exports = {
             user[0].dataValues.account_updated = user[0].dataValues.updatedAt;
             delete user[0].dataValues.createdAt;
             delete user[0].dataValues.updatedAt;
+
+            var endDate   = new Date();
+            var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+            client.timing('successfulUserFetch_APICallTime', seconds);
             res.status(200).send(user[0]);
 
           } else {
