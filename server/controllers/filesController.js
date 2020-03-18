@@ -127,7 +127,7 @@ module.exports = {
                         uploadS3(req, res, function (err) {
                             let endDate3 = new Date();
                             let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
-                            client.timing('deleteFile_DBQueryTime', seconds3);
+                            client.timing('createFile_S3UploadTime', seconds3);
                             if (err) {
                                 return res.status(400).send(err);
                             } else {
@@ -362,7 +362,7 @@ module.exports = {
                                         }, function (err09) {
                                             let endDate3 = new Date();
                                             let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
-                                            client.timing('deleteFile_DBQueryTime', seconds3);
+                                            client.timing('deleteFile_S3Time', seconds3);
                                             if (err09) {
                                                 return res.status(400).send({
                                                     message: "Error while deleting from S3!"
