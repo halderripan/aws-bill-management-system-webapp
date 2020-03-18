@@ -59,7 +59,7 @@ module.exports = {
               })
               .then((user) => {
                 let endDate2 = new Date();
-                let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
                 client.timing('createUser_DBQueryTime', seconds2);
                 delete user.dataValues.password;
                 user.dataValues.account_created = user.dataValues.createdAt;
@@ -67,7 +67,7 @@ module.exports = {
                 delete user.dataValues.createdAt;
                 delete user.dataValues.updatedAt;
                 let endDate = new Date();
-                let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                let seconds = (endDate.getTime() - startDate.getTime()) ;
                 client.timing('successfulUserCreation_APICallTime', seconds);
                 res.status(201).send(user)
               })
@@ -150,10 +150,10 @@ module.exports = {
                     })
                   .then((user) => {
                     let endDate2 = new Date();
-                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
                     client.timing('updateUser_DBQueryTime', seconds2);
                     let endDate = new Date();
-                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                    let seconds = (endDate.getTime() - startDate.getTime()) ;
                     client.timing('successfulUserUpdation_APICallTime', seconds);
                     res.status(204).send("Updated Successfully!")
                   })
@@ -194,7 +194,7 @@ module.exports = {
       })
       .then((user) => {
         let endDate2 = new Date();
-        let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+        let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
         client.timing('getUser_DBQueryTime', seconds2);
         if (user.length == 0) {
           return res.status(404).send({
@@ -215,7 +215,7 @@ module.exports = {
             delete user[0].dataValues.updatedAt;
 
             let endDate   = new Date();
-            let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+            let seconds = (endDate.getTime() - startDate.getTime()) ;
             client.timing('successfulUserFetch_APICallTime', seconds);
             res.status(200).send(user[0]);
 

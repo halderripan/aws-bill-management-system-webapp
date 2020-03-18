@@ -127,7 +127,7 @@ module.exports = {
                         let startDate3 = new Date();
                         uploadS3(req, res, function (err) {
                             let endDate3 = new Date();
-                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
+                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) ;
                             client.timing('createFile_S3UploadTime', seconds3);
                             if (err) {
                                 return res.status(400).send(err);
@@ -150,7 +150,7 @@ module.exports = {
                                     })
                                     .then((file) => {
                                         let endDate2 = new Date();
-                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
                                         client.timing('createFile_DBQueryTime', seconds2);
                                         delete file.dataValues.createdAt;
                                         delete file.dataValues.updatedAt;
@@ -169,7 +169,7 @@ module.exports = {
                                                 }
                                             )
                                         let endDate = new Date();
-                                        let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                        let seconds = (endDate.getTime() - startDate.getTime()) ;
                                         client.timing('successfulUserFetch_APICallTime', seconds);
                                         res.status(201).send(file);
                                     })
@@ -242,7 +242,7 @@ module.exports = {
                             })
                             .then((file) => {
                                 let endDate2 = new Date();
-                                let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
                                 client.timing('getFile_DBQueryTime', seconds2);
                                 if (file.length == 0) {
                                     return res.status(404).send({
@@ -262,7 +262,7 @@ module.exports = {
                                 delete file[0].dataValues.md5;
                                 delete file[0].dataValues.key;
                                 let endDate   = new Date();
-                                let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                let seconds = (endDate.getTime() - startDate.getTime()) ;
                                 client.timing('successfulUserFetch_APICallTime', seconds);
                                 res.status(200).send(file[0]);
                             })
@@ -346,7 +346,7 @@ module.exports = {
                                     })
                                     .then((file) => {
                                         let endDate2 = new Date();
-                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
                                         client.timing('deleteFile_DBQueryTime', seconds2);
                                         if (file.length == 0) {
                                             return res.status(404).send({
@@ -364,7 +364,7 @@ module.exports = {
                                             Key: file[0].key
                                         }, function (err09) {
                                             let endDate3 = new Date();
-                                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) / 1000;
+                                            let seconds3 = (endDate3.getTime() - startDate3.getTime()) ;
                                             client.timing('deleteFile_S3Time', seconds3);
                                             if (err09) {
                                                 return res.status(400).send({
@@ -380,7 +380,7 @@ module.exports = {
                                                     .then((rowDeleted) => {
                                                         if (rowDeleted === 1) {
                                                             let endDate   = new Date();
-                                                            let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                                            let seconds = (endDate.getTime() - startDate.getTime()) ;
                                                             client.timing('successfulUserFetch_APICallTime', seconds);
                                                             res.status(204).send('Deleted successfully');
                                                         }
