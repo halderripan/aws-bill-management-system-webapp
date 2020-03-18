@@ -8,7 +8,7 @@
             "files": {
                 "collect_list": [
                     {
-                        "file_path": "/home/ubuntu/webapp-log4s.log",
+                        "file_path": "webapp-log4s.log",
                         "log_group_name": "csye6225-logs",
                         "log_stream_name": "webapp",
                         "timezone": "UTC"
