@@ -129,6 +129,7 @@ module.exports = {
                                 console.log("-----------------------------------------------------------------------")
                                 console.log(req.file);
 
+                                let startDate2 = new Date();
                                 return File
                                     .create({
                                         id: uuidv4(),
@@ -142,6 +143,9 @@ module.exports = {
                                         key: req.file.key
                                     })
                                     .then((file) => {
+                                        let endDate2 = new Date();
+                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                        client.timing('createFile_DBQueryTime', seconds2);
                                         delete file.dataValues.createdAt;
                                         delete file.dataValues.updatedAt;
                                         delete file.dataValues.fileOwner;
@@ -221,6 +225,7 @@ module.exports = {
                         })
                     }
                     else {
+                        let startDate2 = new Date();
                         return File
                             .findAll({
                                 where: {
@@ -228,6 +233,9 @@ module.exports = {
                                 }
                             })
                             .then((file) => {
+                                let endDate2 = new Date();
+                                let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                client.timing('getFile_DBQueryTime', seconds2);
                                 if (file.length == 0) {
                                     return res.status(404).send({
                                         message: "File Not Found!"
@@ -319,6 +327,7 @@ module.exports = {
                                 }
                             })
                             .then((resp) => {
+                                let startDate2 = new Date();
                                 return File
                                     .findAll({
                                         where: {
@@ -326,6 +335,9 @@ module.exports = {
                                         }
                                     })
                                     .then((file) => {
+                                        let endDate2 = new Date();
+                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                                        client.timing('deleteFile_DBQueryTime', seconds2);
                                         if (file.length == 0) {
                                             return res.status(404).send({
                                                 message: "File Not Found!"

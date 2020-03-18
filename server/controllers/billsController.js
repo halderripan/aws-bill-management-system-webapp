@@ -25,7 +25,7 @@ const bucket = process.env.S3_BUCKET;
 //Logger
 const LOGGER = require("../logger/logger.js");
 const SDC = require('statsd-client');
-const sdc = new SDC({host: 'localhost', port: 8125});
+const sdc = new SDC({ host: 'localhost', port: 8125 });
 
 module.exports = {
 
@@ -46,9 +46,13 @@ module.exports = {
             billData = req.body;
             billData.id = uuidv4();
             billData.owner_id = user.id;
+            let startDate2 = new Date();
             return Bill
                 .create(billData)
                 .then((bill) => {
+                    let endDate2 = new Date();
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                    client.timing('createBill_DBQueryTime', seconds2);
                     console.log("Test 1---------------------");
                     bill.dataValues.created_ts = bill.dataValues.createdAt;
                     bill.dataValues.updated_ts = bill.dataValues.updatedAt;
@@ -87,6 +91,7 @@ module.exports = {
             return;
         }
         authorizeAnUser(req, res).then(function (user) {
+            let startDate2 = new Date();
             return Bill
                 .findAll({
                     where: {
@@ -96,6 +101,9 @@ module.exports = {
                     include: File
                 })
                 .then((bills) => {
+                    let endDate2 = new Date();
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                    client.timing('getBillByID_DBQueryTime', seconds2);
                     if (bills.length == 0) {
                         return res.status(404).send({
                             message: "Bill Not Found!"
@@ -153,6 +161,7 @@ module.exports = {
             return;
         }
         authorizeAnUser(req, res).then(function (user) {
+            let startDate2 = new Date();
             return Bill
                 .findAll({
                     where: {
@@ -161,6 +170,9 @@ module.exports = {
                     include: File
                 })
                 .then((bills) => {
+                    let endDate2 = new Date();
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                    client.timing('getAllBills_DBQueryTime', seconds2);
                     if (bills.length == 0) {
                         return res.status(404).send({
                             message: "No Bills Found!"
@@ -262,9 +274,6 @@ module.exports = {
                                             })
                                             .then((rowDeleted) => {
                                                 if (rowDeleted === 1) {
-                                                    let endDate = new Date();
-                                                    let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-                                                    sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
                                                     res.status(204).send('Deleted successfully');
                                                 }
                                             })
@@ -278,6 +287,7 @@ module.exports = {
                                 res.status(400).send(error10);
                             });
                     }
+                    let startDate2 = new Date();
                     return Bill
                         .destroy({
                             where: {
@@ -285,7 +295,13 @@ module.exports = {
                             }
                         })
                         .then((rowDeleted) => {
+                            let endDate2 = new Date();
+                            let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                            client.timing('deleteBillByID_DBQueryTime', seconds2);
                             if (rowDeleted === 1) {
+                                let endDate = new Date();
+                                let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                                sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
                                 res.status(204).send('Deleted successfully');
                             }
                         })
@@ -343,7 +359,7 @@ module.exports = {
                             message: "User not authorized to update this Bill!"
                         })
                     }
-
+                    let startDate2 = new Date();
                     return Bill
                         .update({
                             vendor: req.body.vendor,
@@ -359,6 +375,9 @@ module.exports = {
                             }
                         })
                         .then((resp) => {
+                            let endDate2 = new Date();
+                            let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                            client.timing('updateBillByID_DBQueryTime', seconds2);
                             return Bill
                                 .findAll({
                                     where: {

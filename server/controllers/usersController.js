@@ -48,6 +48,7 @@ module.exports = {
           let flag = passwordCheck(res, pwd);
 
           if (!flag) {
+            let startDate2 = new Date();
             return User
               .create({
                 id: uuidv4(),
@@ -57,6 +58,9 @@ module.exports = {
                 password: hash
               })
               .then((user) => {
+                let endDate2 = new Date();
+                let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                client.timing('createUser_DBQueryTime', seconds2);
                 delete user.dataValues.password;
                 user.dataValues.account_created = user.dataValues.createdAt;
                 user.dataValues.account_updated = user.dataValues.updatedAt;
@@ -134,6 +138,7 @@ module.exports = {
             bcrypt.hash(req.body.password, 5).then(function (hash) {
               let flag = passwordCheck(res, req.body.password);
               if (!flag) {
+                let startDate2 = new Date();
                 return User
                   .update({
                     first_name: req.body.first_name,
@@ -144,7 +149,9 @@ module.exports = {
                       where: { email_address: userName }
                     })
                   .then((user) => {
-
+                    let endDate2 = new Date();
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+                    client.timing('updateUser_DBQueryTime', seconds2);
                     let endDate = new Date();
                     let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
                     client.timing('successfulUserUpdation_APICallTime', seconds);
@@ -177,6 +184,7 @@ module.exports = {
     const userName = loginInfo[0];
     const passwordFromToken = loginInfo[1];
 
+    let startDate2 = new Date();
     return User
       .findAll({
         limit: 1,
@@ -185,6 +193,9 @@ module.exports = {
         },
       })
       .then((user) => {
+        let endDate2 = new Date();
+        let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
+        client.timing('getUser_DBQueryTime', seconds2);
         if (user.length == 0) {
           return res.status(404).send({
             message: 'User Not Found! Invalid Username!',
