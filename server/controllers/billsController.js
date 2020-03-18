@@ -71,6 +71,7 @@ module.exports = {
 
     getBillByID(req, res) {
         // client.increment('getBillByID');
+        sdc.increment('getBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -132,6 +133,7 @@ module.exports = {
 
     getAllBills(req, res) {
         // client.increment('getAllBills');
+        sdc.increment('getAllBills');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -181,6 +183,7 @@ module.exports = {
 
     deleteBillByID(req, res) {
         // client.increment('deleteBillByID');
+        sdc.increment('deleteBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
@@ -293,6 +296,7 @@ module.exports = {
 
     updateBillByID(req, res) {
         // client.increment('updateBillByID');
+        sdc.increment('updateBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })

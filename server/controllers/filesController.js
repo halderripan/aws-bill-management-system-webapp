@@ -17,7 +17,6 @@ aws.config.update({
     "region": 'us-east-1'
 });
 const StatsD = require('node-statsd'), client = new StatsD();
-// Create CloudWatch service object
 //Logger
 const LOGGER = require("../logger/logger.js");
 
