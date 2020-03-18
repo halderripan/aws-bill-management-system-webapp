@@ -241,6 +241,14 @@ module.exports = {
                             message: "User not authorized to delete this Bill!"
                         })
                     }
+                    LOGGER.info("-----------bills[0].dataValues-------------");
+                    LOGGER.info(bills[0].dataValues);
+                    LOGGER.info("-----------bills[0]-------------");
+                    LOGGER.info(bills[0]);
+                    LOGGER.info("-----------bills-------------");
+                    LOGGER.info(bills);
+                    LOGGER.info("-----------bills[0].dataValues.attachment-------------");
+                    LOGGER.info(bills[0].dataValues.attachment);
                     if (bills[0].dataValues.attachment != null) {
 
                         LOGGER.info("Bill Has Some Attachments");
