@@ -242,8 +242,6 @@ module.exports = {
                             message: "User not authorized to delete this Bill!"
                         })
                     }
-                    LOGGER.info("-----------bills[0].dataValues.attachment.dataValues.id-------------");
-                    LOGGER.info(bills[0].dataValues.attachment.dataValues.id);
                     if (bills[0].dataValues.attachment != null) {
 
                         LOGGER.info("Bill Has Some Attachments");
