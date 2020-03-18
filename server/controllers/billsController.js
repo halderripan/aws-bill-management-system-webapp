@@ -242,14 +242,8 @@ module.exports = {
                             message: "User not authorized to delete this Bill!"
                         })
                     }
-                    LOGGER.info("-----------bills[0].dataValues-------------");
-                    LOGGER.info(bills[0].dataValues);
-                    LOGGER.info("-----------bills[0]-------------");
-                    LOGGER.info(bills[0]);
                     LOGGER.info("-----------bills[0].dataValues.attachment.dataValues.id-------------");
                     LOGGER.info(bills[0].dataValues.attachment.dataValues.id);
-                    LOGGER.info("-----------bills[0].dataValues.attachment-------------");
-                    LOGGER.info(bills[0].dataValues.attachment);
                     if (bills[0].dataValues.attachment != null) {
 
                         LOGGER.info("Bill Has Some Attachments");
@@ -260,14 +254,6 @@ module.exports = {
                                 }
                             })
                             .then((files) => {
-                                // fs.unlink(files[0].dataValues.url, function (err) {
-                                //     File
-                                //         .destroy({
-                                //             where: {
-                                //                 id: bills[0].dataValues.attachment
-                                //             }
-                                //         })
-                                // })
                                 LOGGER.debug("-------Files-----Datavalues---------debug--------------- ");
                                 LOGGER.debug(files[0].dataValues);
                                 let startDate3 = new Date();
@@ -289,7 +275,7 @@ module.exports = {
                                         return File
                                             .destroy({
                                                 where: {
-                                                    id: bills[0].dataValues.attachment
+                                                    id: bills[0].dataValues.attachment.dataValues.id
                                                 }
                                             })
                                             .then((rowDeleted) => {
