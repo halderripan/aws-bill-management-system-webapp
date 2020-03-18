@@ -31,6 +31,7 @@ const sdc = new SDC({ host: 'localhost', port: 8125 });
 module.exports = {
 
     createBill(req, res) {
+        LOGGER.info("Entering into Create Bill");
         let startDate = new Date();
         sdc.increment('createBill');
         const errors = validationResult(req)
@@ -50,7 +51,7 @@ module.exports = {
             billData.owner_id = user.id;
             let startDate2 = new Date();
 
-            LOGGER.info("startDate2 = " + startDate2 + " :: " + FileName);
+            LOGGER.debug("startDate2 = " + startDate2 + " :: " + FileName);
             return Bill
                 .create(billData)
                 .then((bill) => {
@@ -65,14 +66,15 @@ module.exports = {
                     let endDate = new Date();
                     let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
                     sdc.timing('successfulCreateBill_APICallTime', seconds);
+                    LOGGER.debug("Bill Created Successfully");
                     res.status(201).send(bill)
                 })
                 .catch((error1) => {
-                    if (error1.errors[0].value == "Invalid date") {
-                        res.status(400).send({
-                            message: "Invalid Date!"
-                        });
-                    }
+                    // if (error1.errors[0].value == "Invalid date") {
+                    //     res.status(400).send({
+                    //         message: "Invalid Date!"
+                    //     });
+                    // }
                     LOGGER.error("Error Occured in createBill :: " + FileName + " :: error1 : " + error1);
                     res.status(400).send(error1);
                 });
@@ -84,10 +86,12 @@ module.exports = {
     },
 
     getBillByID(req, res) {
+        LOGGER.info("Entering into GET Bill By ID");
         let startDate = new Date();
         sdc.increment('getBillByID');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.error({ errors: errors.array() });
             return res.status(400).json({ errors: errors.array() })
         }
 
@@ -110,11 +114,13 @@ module.exports = {
                     let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
                     sdc.timing('getBillByID_DBQueryTime', seconds2);
                     if (bills.length == 0) {
+                        LOGGER.error("Bill Not Found");
                         return res.status(404).send({
                             message: "Bill Not Found!"
                         })
                     }
                     else if (bills[0].dataValues.owner_id != user.dataValues.id) {
+                        LOGGER.error("User not authorized to view this Bill!");
                         return res.status(401).send({
                             message: "User not authorized to view this Bill!"
                         })
@@ -133,30 +139,35 @@ module.exports = {
                     let endDate = new Date();
                     let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
                     sdc.timing('successfulGetBillByID_APICallTime', seconds);
-
+                    LOGGER.debug("Bill found by ID");
                     return res.status(200).send(bills[0])
                 })
                 .catch((error) => {
                     if (error.parent.file == "uuid.c") {
+                        LOGGER.error("Invalid Bill Id type: UUID/V4 Passed!");
                         res.status(400).send({
                             message: "Invalid Bill Id type: UUID/V4 Passed!"
                         })
                     }
+                    LOGGER.error("Bill Not Found!");
                     res.status(400).send({
                         message: "Bill Not Found!"
                     })
                 });
         })
             .catch((error) => {
+                LOGGER.error("Bill Not Found!");
                 res.status(400).send(error);
             });
     },
 
     getAllBills(req, res) {
+        LOGGER.debug("Entering into getAllBills!")
         let startDate = new Date();
         sdc.increment('getAllBills');
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
+            LOGGER.err(errors);
             return res.status(400).json({ errors: errors.array() })
         }
 
@@ -453,6 +464,7 @@ module.exports = {
 }
 
 function authenticationStatus(resp) {
+    LOGGER.error("Basic Authorization is needed! Please provide Username and Password!");
     resp.writeHead(401, { 'WWW-Authenticate': 'Basic realm="' + realm + '"' });
     resp.end('Basic Authorization is needed! Please provide Username and Password!');
 };
@@ -464,6 +476,7 @@ const authorizeAnUser = function (req, res) {
         const loginInfo = authentication.split(':');
         const userName = loginInfo[0];
         const passwordFromToken = loginInfo[1];
+        LOGGER.info("Authorizing the user : " + userName);
 
         User
             .findAll({
