@@ -12,6 +12,7 @@ const moment = require('moment');
 moment.suppressDeprecationWarnings = true;
 const fs = require('fs');
 Bill.hasOne(File, { foreignKey: 'bill', onDelete: 'CASCADE' });
+const FileName = "billsController.js";
 
 // BCcypt
 const bcrypt = require(`bcrypt`);
@@ -43,17 +44,20 @@ module.exports = {
             return;
         }
         authorizeAnUser(req, res).then(function (user) {
+            LOGGER.info("User Authorized! :: "+ FileName);
             billData = req.body;
             billData.id = uuidv4();
             billData.owner_id = user.id;
             let startDate2 = new Date();
+
+            LOGGER.info("startDate2 = "+startDate2+" :: "+ FileName);
             return Bill
                 .create(billData)
                 .then((bill) => {
+                    LOGGER.info("Bill Created!");
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime()) / 1000;
                     client.timing('createBill_DBQueryTime', seconds2);
-                    console.log("Test 1---------------------");
                     bill.dataValues.created_ts = bill.dataValues.createdAt;
                     bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                     delete bill.dataValues.createdAt;
@@ -69,10 +73,12 @@ module.exports = {
                             message: "Invalid Date!"
                         });
                     }
+                    LOGGER.error("Error Occured in createBill :: " + FileName + " :: error1 : "+ error1);
                     res.status(400).send(error1);
                 });
         })
             .catch((error) => {
+                LOGGER.error("Error Occured in createBill :: " + FileName + " :: error : "+ error);
                 res.status(400).send(error);
             });
     },
