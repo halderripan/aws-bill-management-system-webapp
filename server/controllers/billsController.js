@@ -256,7 +256,7 @@ module.exports = {
                         File
                             .findAll({
                                 where: {
-                                    id: bills[0].dataValues.attachment
+                                    id: bills[0].dataValues.attachment.dataValues.id
                                 }
                             })
                             .then((files) => {
