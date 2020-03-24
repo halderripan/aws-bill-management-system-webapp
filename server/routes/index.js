@@ -11,12 +11,12 @@ module.exports = (app) => {
   // User Routes
   app.get('/v1/user/self', userController.getUser);
   app.put('/v1/user/self', createUserValidator, userController.updateUser);
-  app.post('/v1/user', createUserValidator, userController.createUser);
-  // app.post('/v2/user', createUserValidator, userController.createUser);
+  // app.post('/v1/user', createUserValidator, userController.createUser);
+  app.post('/v2/user', createUserValidator, userController.createUser);
 
   // Bill Routes
   app.get('/v1/bill/:id', billController.getBillByID);
-  app.get('/v2/bills', billController.getAllBills);
+  app.get('/v1/bills', billController.getAllBills);
   app.put('/v1/bill/:id', createBillValidator, paymentStatusValidator, billController.updateBillByID);
   app.post('/v1/bill', createBillValidator, paymentStatusValidator, billController.createBill);
   app.delete('/v1/bill/:id', billController.deleteBillByID);
