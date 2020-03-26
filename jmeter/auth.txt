@@ -1,0 +1,2 @@
+# JMeter generated Authorization file
+http://dev.ripanhalder.me	ripanh10@gmail.com	ASfadf@12345			BASIC
