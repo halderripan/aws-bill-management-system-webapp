@@ -11,8 +11,8 @@ module.exports = (app) => {
   // User Routes
   app.get('/v1/user/self', userController.getUser);
   app.put('/v1/user/self', createUserValidator, userController.updateUser);
-  // app.post('/v1/user', createUserValidator, userController.createUser);
-  app.post('/v2/user', createUserValidator, userController.createUser);
+  app.post('/v1/user', createUserValidator, userController.createUser);
+  // app.post('/v2/user', createUserValidator, userController.createUser);
 
   // Bill Routes
   app.get('/v1/bill/:id', billController.getBillByID);
@@ -24,4 +24,7 @@ module.exports = (app) => {
   app.post('/v1/bill/:id/file', fileController.createFile);
   app.get('/v1/bill/:billId/file/:fileId', fileController.getFile);
   app.delete('/v1/bill/:billId/file/:fileId', fileController.deleteFile);
+
+  // Due Bills For SNS
+  app.get('/v1/bills/due/:x', billController.getDueBills);
 };

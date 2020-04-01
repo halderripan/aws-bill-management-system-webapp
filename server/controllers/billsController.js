@@ -57,14 +57,14 @@ module.exports = {
                 .then((bill) => {
                     LOGGER.info("Bill Created!");
                     let endDate2 = new Date();
-                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('createBill_DBQueryTime', seconds2);
                     bill.dataValues.created_ts = bill.dataValues.createdAt;
                     bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                     delete bill.dataValues.createdAt;
                     delete bill.dataValues.updatedAt;
                     let endDate = new Date();
-                    let seconds = (endDate.getTime() - startDate.getTime()) ;
+                    let seconds = (endDate.getTime() - startDate.getTime());
                     sdc.timing('successfulCreateBill_APICallTime', seconds);
                     LOGGER.debug("Bill Created Successfully");
                     res.status(201).send(bill)
@@ -111,7 +111,7 @@ module.exports = {
                 })
                 .then((bills) => {
                     let endDate2 = new Date();
-                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getBillByID_DBQueryTime', seconds2);
                     if (bills.length == 0) {
                         LOGGER.error("Bill Not Found");
@@ -137,7 +137,7 @@ module.exports = {
                     delete bills[0].dataValues.createdAt;
                     delete bills[0].dataValues.updatedAt;
                     let endDate = new Date();
-                    let seconds = (endDate.getTime() - startDate.getTime()) ;
+                    let seconds = (endDate.getTime() - startDate.getTime());
                     sdc.timing('successfulGetBillByID_APICallTime', seconds);
                     LOGGER.debug("Bill found by ID");
                     return res.status(200).send(bills[0])
@@ -186,7 +186,7 @@ module.exports = {
                 })
                 .then((bills) => {
                     let endDate2 = new Date();
-                    let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
                     if (bills.length == 0) {
                         return res.status(404).send({
@@ -207,9 +207,74 @@ module.exports = {
                         delete bill.dataValues.updatedAt;
                     });
                     let endDate = new Date();
-                    let seconds = (endDate.getTime() - startDate.getTime()) ;
+                    let seconds = (endDate.getTime() - startDate.getTime());
                     sdc.timing('successfulGetAllBills_APICallTime', seconds);
                     LOGGER.info("All Bills Fetched!");
+                    return res.status(200).send(bills);
+                })
+                .catch((error) => res.status(400).send({
+                    message: "Bill not found!"
+                }));
+        })
+            .catch((error) => {
+                res.status(400).send(error);
+            });
+    },
+
+    getDueBills(req, res) {
+        LOGGER.debug("Entering into getDueBills!")
+        let startDate = new Date();
+        sdc.increment('getDueBills');
+        let noOfDays = req.params.x;
+        addDays(startDate, noOfDays);
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            LOGGER.err(errors);
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        if (!req.headers.authorization) {
+            authenticationStatus(res);
+            return;
+        }
+        authorizeAnUser(req, res).then(function (user) {
+            let startDate2 = new Date();
+            return Bill
+                .findAll({
+                    where: {
+                        owner_id: user.dataValues.id,
+                        due_date : {
+                            $gte: moment().add(noOfDays, 'days').toDate()
+                        }
+                    },
+                    include: File
+                })
+                .then((bills) => {
+                    let endDate2 = new Date();
+                    let seconds2 = (endDate2.getTime() - startDate2.getTime());
+                    sdc.timing('getAllBills_DBQueryTime', seconds2);
+                    if (bills.length == 0) {
+                        return res.status(404).send({
+                            message: "No Bills Found!"
+                        })
+                    }
+                    bills.forEach(bill => {
+                        bill.dataValues.created_ts = bill.dataValues.createdAt;
+                        bill.dataValues.updated_ts = bill.dataValues.updatedAt;
+                        if (bill.dataValues.attachment != null) {
+                            delete bill.dataValues.attachment.dataValues.bill;
+                            delete bill.dataValues.attachment.dataValues.md5;
+                            delete bill.dataValues.attachment.dataValues.size;
+                        } else {
+
+                        }
+                        delete bill.dataValues.createdAt;
+                        delete bill.dataValues.updatedAt;
+                    });
+                    let endDate = new Date();
+                    let seconds = (endDate.getTime() - startDate.getTime());
+                    sdc.timing('successfulGetAllBills_APICallTime', seconds);
+                    LOGGER.info("All Due Bills Fetched!");
                     return res.status(200).send(bills);
                 })
                 .catch((error) => res.status(400).send({
@@ -273,7 +338,7 @@ module.exports = {
                                     Key: files[0].key
                                 }, function (err09) {
                                     let endDate3 = new Date();
-                                    let seconds3 = (endDate3.getTime() - startDate3.getTime()) ;
+                                    let seconds3 = (endDate3.getTime() - startDate3.getTime());
                                     sdc.timing('deleteFile_S3Time', seconds3);
                                     if (err09) {
                                         LOGGER.error("--------------S3 Delete Error:-------- :: err09 : " + err09);
@@ -299,11 +364,11 @@ module.exports = {
                                                     })
                                                     .then((rowDeleted) => {
                                                         let endDate2 = new Date();
-                                                        let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                                                        let seconds2 = (endDate2.getTime() - startDate2.getTime());
                                                         sdc.timing('deleteBillByID_DBQueryTime', seconds2);
                                                         if (rowDeleted === 1) {
                                                             let endDate = new Date();
-                                                            let seconds = (endDate.getTime() - startDate.getTime()) ;
+                                                            let seconds = (endDate.getTime() - startDate.getTime());
                                                             sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
                                                             LOGGER.info("Bill Deleted Successfuuly");
                                                             res.status(204).send('Deleted successfully');
@@ -338,11 +403,11 @@ module.exports = {
                             })
                             .then((rowDeleted) => {
                                 let endDate2 = new Date();
-                                let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                                let seconds2 = (endDate2.getTime() - startDate2.getTime());
                                 sdc.timing('deleteBillByID_DBQueryTime', seconds2);
                                 if (rowDeleted === 1) {
                                     let endDate = new Date();
-                                    let seconds = (endDate.getTime() - startDate.getTime()) ;
+                                    let seconds = (endDate.getTime() - startDate.getTime());
                                     sdc.timing('successfulDeleteBillByID_APICallTime', seconds);
                                     LOGGER.info("Bill Deleted Successfuuly");
                                     res.status(204).send('Deleted successfully');
@@ -425,7 +490,7 @@ module.exports = {
                         })
                         .then((resp) => {
                             let endDate2 = new Date();
-                            let seconds2 = (endDate2.getTime() - startDate2.getTime()) ;
+                            let seconds2 = (endDate2.getTime() - startDate2.getTime());
                             sdc.timing('updateBillByID_DBQueryTime', seconds2);
                             return Bill
                                 .findAll({
@@ -441,7 +506,7 @@ module.exports = {
                                         delete bill.dataValues.updatedAt;
                                     });
                                     let endDate = new Date();
-                                    let seconds = (endDate.getTime() - startDate.getTime()) ;
+                                    let seconds = (endDate.getTime() - startDate.getTime());
                                     sdc.timing('successfulUpdateBillByID_APICallTime', seconds);
                                     LOGGER.info("Successfully Updated a Bill By ID");
                                     return res.status(200).send(bills[0]);
@@ -489,6 +554,12 @@ function authenticationStatus(resp) {
     resp.writeHead(401, { 'WWW-Authenticate': 'Basic realm="' + realm + '"' });
     resp.end('Basic Authorization is needed! Please provide Username and Password!');
 };
+
+function addDays(date, days) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
 
 const authorizeAnUser = function (req, res) {
     return new Promise(function (resolve, reject) {
