@@ -45,11 +45,12 @@ const { Consumer } = require('sqs-consumer');
 const consumer = Consumer.create({
     queueUrl: queueURL,
     handleMessage: async (message) => {
+        LOGGER.debug("Queue Polled Message -> " + message);
         LOGGER.debug("Queue Polled Message Body -> " + message.Body);
         LOGGER.debug("Queue Polled Message Attributes -> "+ message.MessageAttributes);
         // LOGGER.debug("Queue Polled Message Attribute - Author -> "+ message.MessageAttributes.Author);
 
-        // publishMessage(message);
+        publishMessage(message);
 
     }
     // sqs: new aws.SQS()
@@ -58,7 +59,7 @@ const consumer = Consumer.create({
 function publishMessage(message) {
     // Create publish parameters
     let snsParams = {
-        Message: 'message',
+        Message: message.Body,
         TopicArn: process.env.TOPIC_ARN
     };
 
