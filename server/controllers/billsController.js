@@ -45,12 +45,36 @@ const { Consumer } = require('sqs-consumer');
 const consumer = Consumer.create({
     queueUrl: queueURL,
     handleMessage: async (message) => {
-        LOGGER.debug("Queue Polled Message Body -> " + JSON.parse(message.Body));
-        // LOGGER.debug("Queue Polled Message Attributes -> "+ message.MessageAttributes);
+        LOGGER.debug("Queue Polled Message Body -> " + message.Body);
+        LOGGER.debug("Queue Polled Message Attributes -> "+ message.MessageAttributes);
         // LOGGER.debug("Queue Polled Message Attribute - Author -> "+ message.MessageAttributes.Author);
-    },
-    sqs: new aws.SQS()
+
+        // publishMessage(message);
+
+    }
+    // sqs: new aws.SQS()
 });
+
+function publishMessage(message) {
+    // Create publish parameters
+    let snsParams = {
+        Message: 'message',
+        TopicArn: process.env.TOPIC_ARN
+    };
+
+    // Create promise and SNS service object
+    let publishTextPromise = new aws.SNS({ apiVersion: '2010-03-31' }).publish(snsParams).promise();
+
+    // Handle promise's fulfilled/rejected states
+    publishTextPromise.then(
+        function(data) {
+          LOGGER.debug(`Message ${snsParams.Message} send sent to the topic ${snsParams.TopicArn}`);
+          LOGGER.debug("MessageID is " + data.MessageId);
+        }).catch(
+          function(err) {
+          LOGGER.error("Publishing Error : ",err, err.stack);
+        });
+}
 
 consumer.on('error', (err) => {
     LOGGER.error("Queue Polling error -> " + err.message);
