@@ -226,6 +226,7 @@ module.exports = {
         let startDate = new Date();
         sdc.increment('getDueBills');
         let noOfDays = req.params.x;
+        LOGGER.debug("No of Days  - "+ noOfDays);
         addDays(startDate, noOfDays);
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -244,12 +245,14 @@ module.exports = {
                     where: {
                         owner_id: user.dataValues.id,
                         due_date : {
-                            $gte: moment().add(noOfDays, 'days').toDate()
+                            // $gte: moment().subtract(noOfDays, 'days').toDate()
+                            $gte: startDate
                         }
                     },
                     include: File
                 })
                 .then((bills) => {
+                    LOGGER.debug("No of Bills Fetched  - "+ bills.length);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
