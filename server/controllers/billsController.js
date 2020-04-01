@@ -14,6 +14,8 @@ const fs = require('fs');
 Bill.hasOne(File, { foreignKey: 'bill', onDelete: 'CASCADE' });
 const FileName = "billsController.js";
 
+const { Op } = require('sequelize');
+
 // BCcypt
 const bcrypt = require(`bcrypt`);
 const Promise = require('promise');
@@ -246,7 +248,7 @@ module.exports = {
                         owner_id: user.dataValues.id,
                         due_date : {
                             // $gte: moment().subtract(noOfDays, 'days').toDate()
-                            $gte: startDate
+                            [Op.gte]: startDate
                         }
                     },
                     include: File
