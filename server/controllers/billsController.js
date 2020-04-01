@@ -261,6 +261,7 @@ module.exports = {
                 })
                 .then((bills) => {
                     LOGGER.debug("No of Bills Fetched  - " + bills.length);
+                    LOGGER.debug("process.env.SQS_QUEUE_URL - "+ process.env.SQS_QUEUE_URL);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
@@ -296,7 +297,7 @@ module.exports = {
                                 StringValue: user.dataValues.email_address
                             }
                         },
-                        MessageBody: bills,
+                        MessageBody: JSON.stringify(bills),
                         QueueUrl: process.env.SQS_QUEUE_URL
                     };
 
