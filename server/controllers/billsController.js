@@ -24,6 +24,8 @@ const uuidv4 = require('uuid/v4');
 const { validationResult } = require('express-validator');
 const aws = require('aws-sdk');
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
+const awsRegion = process.env.AWS_DEFAULT_REGION
+aws.config.update({region: awsRegion});
 
 //Simple Queue Service - SQS
 var sqs = new aws.SQS({ apiVersion: '2012-11-05' });
