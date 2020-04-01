@@ -28,7 +28,7 @@ const awsRegion = process.env.AWS_DEFAULT_REGION;
 aws.config.update({region: awsRegion});
 
 //Simple Queue Service - SQS
-var sqs = new aws.SQS({ apiVersion: '2012-11-05' });
+var sqs = new aws.SQS();
 
 const bucket = process.env.S3_BUCKET;
 const queueUrl = process.env.SQS_QUEUE_URL;
@@ -303,7 +303,7 @@ module.exports = {
                             }
                         },
                         MessageBody: JSON.stringify(bills),
-                        QueueUrl: "https://sqs.us-east-1.amazonaws.com/390963358109/SQSQueue-csye6225-app-assig9-2"
+                        QueueUrl: queueUrl
                     };
 
                     //Send Message to SQS
