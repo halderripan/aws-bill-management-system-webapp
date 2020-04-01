@@ -25,17 +25,44 @@ const { validationResult } = require('express-validator');
 const aws = require('aws-sdk');
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
 const awsRegion = process.env.AWS_DEFAULT_REGION;
-aws.config.update({region: awsRegion});
+aws.config.update({ region: awsRegion });
 
 //Simple Queue Service - SQS
 var sqs = new aws.SQS();
 
 const bucket = process.env.S3_BUCKET;
-const queueUrl = process.env.SQS_QUEUE_URL;
+const queueURL = process.env.SQS_QUEUE_URL;
+
 //Logger
 const LOGGER = require("../logger/logger.js");
+
+//Statsd for metrics
 const SDC = require('statsd-client');
 const sdc = new SDC({ host: 'localhost', port: 8125 });
+
+//async function that handles the SQS message processing.
+const { Consumer } = require('sqs-consumer');
+const app2 = Consumer.create({
+    queueUrl: queueURL,
+    handleMessage: async (message) => {
+        LOGGER.debug("Queue Polled Message -> " + message);
+    },
+    sqs: new aws.SQS()
+});
+
+app2.on('error', (err) => {
+    LOGGER.error("Queue Polling error -> " + err.message);
+});
+
+app2.on('processing_error', (err) => {
+    LOGGER.error("Queue Polling processing_error -> " + err.message);
+});
+
+app2.on('timeout_error', (err) => {
+    LOGGER.error("Queue Polling timeout_error -> " + err.message);
+});
+
+app2.start();
 
 module.exports = {
 
@@ -264,9 +291,9 @@ module.exports = {
                 })
                 .then((bills) => {
                     LOGGER.debug("No of Bills Fetched  - " + bills.length);
-                    LOGGER.debug("SQS_QUEUE_URL - "+ queueUrl);
-                    LOGGER.debug("awsRegion : "+ awsRegion);
-                    LOGGER.debug("Bucket - "+ bucket);
+                    LOGGER.debug("SQS_QUEUE_URL - " + queueURL);
+                    LOGGER.debug("awsRegion : " + awsRegion);
+                    LOGGER.debug("Bucket - " + bucket);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
@@ -303,7 +330,7 @@ module.exports = {
                             }
                         },
                         MessageBody: JSON.stringify(bills),
-                        QueueUrl: queueUrl
+                        QueueUrl: queueURL
                     };
 
                     //Send Message to SQS
