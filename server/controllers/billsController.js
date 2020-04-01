@@ -24,6 +24,10 @@ const uuidv4 = require('uuid/v4');
 const { validationResult } = require('express-validator');
 const aws = require('aws-sdk');
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
+
+//Simple Queue Service - SQS
+var sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
+
 const bucket = process.env.S3_BUCKET;
 //Logger
 const LOGGER = require("../logger/logger.js");
@@ -228,8 +232,8 @@ module.exports = {
         let startDate = new Date();
         sdc.increment('getDueBills');
         let noOfDays = req.params.x;
-        LOGGER.debug("No of Days  - "+ noOfDays);
-        LOGGER.debug("Start Date  - "+ startDate);
+        LOGGER.debug("No of Days  - " + noOfDays);
+        LOGGER.debug("Start Date  - " + startDate);
         LOGGER.debug("moment().format() : " + moment().format());
         addDays(startDate, noOfDays);
         const errors = validationResult(req)
@@ -248,7 +252,7 @@ module.exports = {
                 .findAll({
                     where: {
                         owner_id: user.dataValues.id,
-                        due_date : {
+                        due_date: {
                             [Op.lte]: moment().add(noOfDays, 'days').toDate(),
                             [Op.gte]: moment().format()
                         }
@@ -256,7 +260,7 @@ module.exports = {
                     include: File
                 })
                 .then((bills) => {
-                    LOGGER.debug("No of Bills Fetched  - "+ bills.length);
+                    LOGGER.debug("No of Bills Fetched  - " + bills.length);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
@@ -278,6 +282,33 @@ module.exports = {
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
                     });
+
+                    //  SQS  Params
+                    let sqsParams = {
+                        DelaySeconds: 10,
+                        MessageAttributes: {
+                            "Title": {
+                                DataType: "String",
+                                StringValue: "Fetch Due Bills"
+                            },
+                            "Author": {
+                                DataType: "String",
+                                StringValue: user.dataValues.email_address
+                            }
+                        },
+                        MessageBody: bills,
+                        QueueUrl: process.env.SQS_QUEUE_URL
+                    };
+
+                    //Send Message to SQS
+                    sqs.sendMessage(sqsParams, function (err, data) {
+                        if (err) {
+                            LOGGER.error("SQS Message Sent Error : ", err);
+                        } else {
+                            LOGGER.debug("SQS Message Sent Success : ", data.MessageId);
+                        }
+                    });
+
                     let endDate = new Date();
                     let seconds = (endDate.getTime() - startDate.getTime());
                     sdc.timing('successfulGetAllBills_APICallTime', seconds);
@@ -566,7 +597,7 @@ function addDays(date, days) {
     var result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
-  }
+}
 
 const authorizeAnUser = function (req, res) {
     return new Promise(function (resolve, reject) {
