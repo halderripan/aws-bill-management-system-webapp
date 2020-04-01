@@ -42,27 +42,29 @@ const sdc = new SDC({ host: 'localhost', port: 8125 });
 
 //async function that handles the SQS message processing.
 const { Consumer } = require('sqs-consumer');
-const app2 = Consumer.create({
+const consumer = Consumer.create({
     queueUrl: queueURL,
     handleMessage: async (message) => {
-        LOGGER.debug("Queue Polled Message -> " + message);
+        LOGGER.debug("Queue Polled Message Body -> " + JSON.parse(message.Body));
+        LOGGER.debug("Queue Polled Message Attributes -> "+ JSON.parse(message.MessageAttributes));
+        LOGGER.debug("Queue Polled Message Attribute - Author -> "+ message.MessageAttributes.Author);
     },
     sqs: new aws.SQS()
 });
 
-app2.on('error', (err) => {
+consumer.on('error', (err) => {
     LOGGER.error("Queue Polling error -> " + err.message);
 });
 
-app2.on('processing_error', (err) => {
+consumer.on('processing_error', (err) => {
     LOGGER.error("Queue Polling processing_error -> " + err.message);
 });
 
-app2.on('timeout_error', (err) => {
+consumer.on('timeout_error', (err) => {
     LOGGER.error("Queue Polling timeout_error -> " + err.message);
 });
 
-app2.start();
+consumer.start();
 
 module.exports = {
 
