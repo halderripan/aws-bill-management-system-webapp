@@ -24,7 +24,7 @@ const uuidv4 = require('uuid/v4');
 const { validationResult } = require('express-validator');
 const aws = require('aws-sdk');
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
-const awsRegion = process.env.AWS_DEFAULT_REGION
+const awsRegion = process.env.AWS_DEFAULT_REGION;
 aws.config.update({region: awsRegion});
 
 //Simple Queue Service - SQS
@@ -265,6 +265,7 @@ module.exports = {
                 .then((bills) => {
                     LOGGER.debug("No of Bills Fetched  - " + bills.length);
                     LOGGER.debug("SQS_QUEUE_URL - "+ queueUrl);
+                    LOGGER.debug("awsRegion : "+ awsRegion);
                     LOGGER.debug("Bucket - "+ bucket);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
