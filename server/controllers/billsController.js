@@ -45,9 +45,9 @@ const { Consumer } = require('sqs-consumer');
 const consumer = Consumer.create({
     queueUrl: queueURL,
     handleMessage: async (message) => {
-        LOGGER.debug("Queue Polled Message Body -> " + message.Body);
-        LOGGER.debug("Queue Polled Message Attributes -> "+ message.MessageAttributes);
-        LOGGER.debug("Queue Polled Message Attribute - Author -> "+ message.MessageAttributes.Author);
+        LOGGER.debug("Queue Polled Message Body -> " + JSON.parse(message.Body));
+        // LOGGER.debug("Queue Polled Message Attributes -> "+ message.MessageAttributes);
+        // LOGGER.debug("Queue Polled Message Attribute - Author -> "+ message.MessageAttributes.Author);
     },
     sqs: new aws.SQS()
 });
