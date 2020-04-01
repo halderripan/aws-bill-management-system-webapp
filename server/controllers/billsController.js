@@ -29,6 +29,7 @@ const s3 = new aws.S3({ apiVersion: '2006-03-01' });
 var sqs = new aws.SQS({ apiVersion: '2012-11-05' });
 
 const bucket = process.env.S3_BUCKET;
+const queueUrl = process.env.SQS_QUEUE_URL;
 //Logger
 const LOGGER = require("../logger/logger.js");
 const SDC = require('statsd-client');
@@ -261,7 +262,7 @@ module.exports = {
                 })
                 .then((bills) => {
                     LOGGER.debug("No of Bills Fetched  - " + bills.length);
-                    LOGGER.debug("process.env.SQS_QUEUE_URL - "+ process.env.SQS_QUEUE_URL);
+                    LOGGER.debug("SQS_QUEUE_URL - "+ queueUrl);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
@@ -298,7 +299,7 @@ module.exports = {
                             }
                         },
                         MessageBody: JSON.stringify(bills),
-                        QueueUrl: process.env.SQS_QUEUE_URL
+                        QueueUrl: queueUrl
                     };
 
                     //Send Message to SQS
