@@ -247,8 +247,8 @@ module.exports = {
                     where: {
                         owner_id: user.dataValues.id,
                         due_date : {
-                            // $gte: moment().subtract(noOfDays, 'days').toDate()
-                            [Op.gte]: startDate
+                            [Op.gte]: moment().subtract(noOfDays, 'days').toDate()
+                            // [Op.gte]: startDate
                         }
                     },
                     include: File
