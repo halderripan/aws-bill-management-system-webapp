@@ -229,6 +229,8 @@ module.exports = {
         sdc.increment('getDueBills');
         let noOfDays = req.params.x;
         LOGGER.debug("No of Days  - "+ noOfDays);
+        LOGGER.debug("Start Date  - "+ startDate);
+        LOGGER.debug("moment().format() : " + moment().format());
         addDays(startDate, noOfDays);
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -248,7 +250,7 @@ module.exports = {
                         owner_id: user.dataValues.id,
                         due_date : {
                             [Op.lte]: moment().add(noOfDays, 'days').toDate(),
-                            [Op.gte]: moment().add(0, 'days').toDate()
+                            [Op.gte]: moment().format()
                         }
                     },
                     include: File
