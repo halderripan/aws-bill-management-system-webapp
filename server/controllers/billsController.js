@@ -26,7 +26,7 @@ const aws = require('aws-sdk');
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
 
 //Simple Queue Service - SQS
-var sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
+var sqs = new aws.SQS({ apiVersion: '2012-11-05' });
 
 const bucket = process.env.S3_BUCKET;
 //Logger
