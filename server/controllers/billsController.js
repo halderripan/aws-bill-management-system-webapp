@@ -263,6 +263,7 @@ module.exports = {
                 .then((bills) => {
                     LOGGER.debug("No of Bills Fetched  - " + bills.length);
                     LOGGER.debug("SQS_QUEUE_URL - "+ queueUrl);
+                    LOGGER.debug("Bucket - "+ bucket);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
@@ -299,7 +300,7 @@ module.exports = {
                             }
                         },
                         MessageBody: JSON.stringify(bills),
-                        QueueUrl: queueUrl
+                        QueueUrl: "https://sqs.us-east-1.amazonaws.com/390963358109/SQSQueue-csye6225-app-assig9-2"
                     };
 
                     //Send Message to SQS
