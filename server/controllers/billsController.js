@@ -312,7 +312,8 @@ module.exports = {
                         due_date: {
                             [Op.lte]: moment().add(noOfDays, 'days').toDate(),
                             [Op.gte]: moment().format()
-                        }
+                        },
+                        paymentStatus: "due"
                     },
                     include: File
                 })
@@ -335,7 +336,9 @@ module.exports = {
                     let domain = sourceEmailAddress.substring(sourceEmailAddress.lastIndexOf("@") + 1);
                     let messageBody = {
                         urls: [],
-                        destination_email_address: user.dataValues.email_address
+                        destination_email_address: user.dataValues.email_address,
+                        first_name: user.dataValues.first_name,
+                        noOfDays: noOfDays
                     }
                     bills.forEach(bill => {
 
