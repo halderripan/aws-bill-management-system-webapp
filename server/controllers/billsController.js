@@ -47,7 +47,7 @@ const consumer = Consumer.create({
     handleMessage: async (message) => {
         LOGGER.debug("Queue Polled Message -> " + message);
         LOGGER.debug("Queue Polled Message Body -> " + message.Body);
-        LOGGER.debug("Queue Polled Message Attributes -> "+ message.MessageAttributes);
+        LOGGER.debug("Queue Polled Message Attributes -> " + message.MessageAttributes);
         // LOGGER.debug("Queue Polled Message Attribute - Author -> "+ message.MessageAttributes.Author);
 
         publishMessage(message);
@@ -68,13 +68,13 @@ function publishMessage(message) {
 
     // Handle promise's fulfilled/rejected states
     publishTextPromise.then(
-        function(data) {
-          LOGGER.debug(`Message ${snsParams.Message} send sent to the topic ${snsParams.TopicArn}`);
-          LOGGER.debug("MessageID is " + data.MessageId);
+        function (data) {
+            LOGGER.debug(`Message ${snsParams.Message} send sent to the topic ${snsParams.TopicArn}`);
+            LOGGER.debug("MessageID is " + data.MessageId);
         }).catch(
-          function(err) {
-          LOGGER.error("Publishing Error : ",err, err.stack);
-        });
+            function (err) {
+                LOGGER.error("Publishing Error : ", err, err.stack);
+            });
 }
 
 consumer.on('error', (err) => {
@@ -329,7 +329,18 @@ module.exports = {
                             message: "No Bills Found!"
                         })
                     }
+
+                    // Fetch Domain
+                    let sourceEmailAddress = process.env.SOURCE_EMAIL_ADDRESS;
+                    let domain = sourceEmailAddress.substring(sourceEmailAddress.lastIndexOf("@") + 1);
+                    let messageBody = {
+                        urls: [],
+                        destination_email_address: user.dataValues.email_address
+                    }
                     bills.forEach(bill => {
+
+                        let url = "http://" + domain + "/v1/bill/"+bill.dataValues.id;
+                        messageBody.urls.push(url);
                         bill.dataValues.created_ts = bill.dataValues.createdAt;
                         bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                         if (bill.dataValues.attachment != null) {
@@ -342,12 +353,6 @@ module.exports = {
                         delete bill.dataValues.createdAt;
                         delete bill.dataValues.updatedAt;
                     });
-
-                    // JSON Object Message building
-                    let msgBody  = {
-                        message : bills,
-                        destination_email_address : user.dataValues.email_address
-                    }
 
                     //  SQS  Params
                     let sqsParams = {
@@ -362,7 +367,7 @@ module.exports = {
                                 StringValue: user.dataValues.email_address
                             }
                         },
-                        MessageBody: JSON.stringify(msgBody),
+                        MessageBody: JSON.stringify(messageBody),
                         QueueUrl: queueURL
                     };
 
