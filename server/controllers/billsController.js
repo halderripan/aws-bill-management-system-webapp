@@ -343,6 +343,12 @@ module.exports = {
                         delete bill.dataValues.updatedAt;
                     });
 
+                    // JSON Object Message building
+                    let msgBody  = {
+                        message : bills,
+                        destination_email_address : user.dataValues.email_address
+                    }
+
                     //  SQS  Params
                     let sqsParams = {
                         DelaySeconds: 10,
@@ -356,7 +362,7 @@ module.exports = {
                                 StringValue: user.dataValues.email_address
                             }
                         },
-                        MessageBody: JSON.stringify(bills),
+                        MessageBody: JSON.stringify(msgBody),
                         QueueUrl: queueURL
                     };
 
