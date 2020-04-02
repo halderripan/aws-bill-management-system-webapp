@@ -24,18 +24,72 @@ const uuidv4 = require('uuid/v4');
 const { validationResult } = require('express-validator');
 const aws = require('aws-sdk');
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
-const awsRegion = process.env.AWS_DEFAULT_REGION
-aws.config.update({region: awsRegion});
+const awsRegion = process.env.AWS_DEFAULT_REGION;
+aws.config.update({ region: awsRegion });
 
 //Simple Queue Service - SQS
-var sqs = new aws.SQS({ apiVersion: '2012-11-05' });
+var sqs = new aws.SQS();
 
 const bucket = process.env.S3_BUCKET;
-const queueUrl = process.env.SQS_QUEUE_URL;
+const queueURL = process.env.SQS_QUEUE_URL;
+
 //Logger
 const LOGGER = require("../logger/logger.js");
+
+//Statsd for metrics
 const SDC = require('statsd-client');
 const sdc = new SDC({ host: 'localhost', port: 8125 });
+
+//async function that handles the SQS message processing.
+const { Consumer } = require('sqs-consumer');
+const consumer = Consumer.create({
+    queueUrl: queueURL,
+    handleMessage: async (message) => {
+        LOGGER.debug("Queue Polled Message -> " + message);
+        LOGGER.debug("Queue Polled Message Body -> " + message.Body);
+        LOGGER.debug("Queue Polled Message Attributes -> " + message.MessageAttributes);
+        // LOGGER.debug("Queue Polled Message Attribute - Author -> "+ message.MessageAttributes.Author);
+
+        publishMessage(message);
+
+    }
+    // sqs: new aws.SQS()
+});
+
+function publishMessage(message) {
+    // Create publish parameters
+    let snsParams = {
+        Message: message.Body,
+        TopicArn: process.env.TOPIC_ARN
+    };
+
+    // Create promise and SNS service object
+    let publishTextPromise = new aws.SNS({ apiVersion: '2010-03-31' }).publish(snsParams).promise();
+
+    // Handle promise's fulfilled/rejected states
+    publishTextPromise.then(
+        function (data) {
+            LOGGER.debug(`Message ${snsParams.Message} send sent to the topic ${snsParams.TopicArn}`);
+            LOGGER.debug("MessageID is " + data.MessageId);
+        }).catch(
+            function (err) {
+                LOGGER.error("Publishing Error : ", err, err.stack);
+            });
+}
+
+consumer.on('error', (err) => {
+    LOGGER.error("Queue Polling error -> " + err.message);
+});
+
+consumer.on('processing_error', (err) => {
+    LOGGER.error("Queue Polling processing_error -> " + err.message);
+});
+
+consumer.on('timeout_error', (err) => {
+    LOGGER.error("Queue Polling timeout_error -> " + err.message);
+});
+
+consumer.start();
 
 module.exports = {
 
@@ -258,14 +312,16 @@ module.exports = {
                         due_date: {
                             [Op.lte]: moment().add(noOfDays, 'days').toDate(),
                             [Op.gte]: moment().format()
-                        }
+                        },
+                        paymentStatus: "due"
                     },
                     include: File
                 })
                 .then((bills) => {
                     LOGGER.debug("No of Bills Fetched  - " + bills.length);
-                    LOGGER.debug("SQS_QUEUE_URL - "+ queueUrl);
-                    LOGGER.debug("Bucket - "+ bucket);
+                    LOGGER.debug("SQS_QUEUE_URL - " + queueURL);
+                    LOGGER.debug("awsRegion : " + awsRegion);
+                    LOGGER.debug("Bucket - " + bucket);
                     let endDate2 = new Date();
                     let seconds2 = (endDate2.getTime() - startDate2.getTime());
                     sdc.timing('getAllBills_DBQueryTime', seconds2);
@@ -274,7 +330,20 @@ module.exports = {
                             message: "No Bills Found!"
                         })
                     }
+
+                    // Fetch Domain
+                    let sourceEmailAddress = process.env.SOURCE_EMAIL_ADDRESS;
+                    let domain = sourceEmailAddress.substring(sourceEmailAddress.lastIndexOf("@") + 1);
+                    let messageBody = {
+                        urls: [],
+                        destination_email_address: user.dataValues.email_address,
+                        first_name: user.dataValues.first_name,
+                        noOfDays: noOfDays
+                    }
                     bills.forEach(bill => {
+
+                        let url = "http://" + domain + "/v1/bill/"+bill.dataValues.id;
+                        messageBody.urls.push(url);
                         bill.dataValues.created_ts = bill.dataValues.createdAt;
                         bill.dataValues.updated_ts = bill.dataValues.updatedAt;
                         if (bill.dataValues.attachment != null) {
@@ -301,8 +370,8 @@ module.exports = {
                                 StringValue: user.dataValues.email_address
                             }
                         },
-                        MessageBody: JSON.stringify(bills),
-                        QueueUrl: "https://sqs.us-east-1.amazonaws.com/390963358109/SQSQueue-csye6225-app-assig9-2"
+                        MessageBody: JSON.stringify(messageBody),
+                        QueueUrl: queueURL
                     };
 
                     //Send Message to SQS
