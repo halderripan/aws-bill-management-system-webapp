@@ -28,7 +28,7 @@ const connectionString = 'postgres://' + username + ':' + password + '@' + host 
 
 const fs = require('fs');
 const dir = process.env.HOME_DIRECTORY;
-const rdsCa = fs.readFileSync( dir + "/rds-combined-ca-bundle.pem");
+const rdsCa = fs.readFileSync( dir + "rds-combined-ca-bundle.pem");
 
 const init = function (callback) {
     const client = new Client({
