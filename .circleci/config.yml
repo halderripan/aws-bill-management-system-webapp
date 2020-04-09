@@ -70,7 +70,7 @@ jobs: # a collection of steps
       - run: 
           name: Download CA CERTIFICATE
           command: |
-            curl https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem
+            curl -o /home/circleci/rds-combined-ca-bundle.pem https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem
 
       - save_cache: # special step to save the dependency cache
           key: dependency-cache-{{ checksum "package-lock.json" }}
