@@ -36,13 +36,13 @@ const init = function (callback) {
         password: password,
         port: port,
         // connectionString : connectionString
-        // dialectOptions: {
+        dialectOptions: {
         //     // ssl: {
         //     //     rejectUnauthorized: true,
         //     //     ca: [rdsCa]
         //     // }
-        //     ssl: true
-        // }
+            ssl: true
+        }
     })
 
     client.connect();
