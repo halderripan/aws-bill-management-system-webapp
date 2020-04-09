@@ -24,9 +24,9 @@ let sequelize = new Sequelize(dbName, username, password,
 );
 const connectionString = 'postgres://' + username + ':' + password + '@' + host + '/postgres';
 
-// const fs = require('fs');
-// const dir = "server/certificates";
-// const rdsCa = fs.readFileSync( dir + "/rds-combined-ca-bundle.pem");
+const fs = require('fs');
+const dir = "server/certificates";
+const rdsCa = fs.readFileSync( dir + "/rds-combined-ca-bundle.pem");
 
 const init = function (callback) {
     const client = new Client({
@@ -37,11 +37,11 @@ const init = function (callback) {
         port: port,
         // connectionString : connectionString
         dialectOptions: {
-        //     // ssl: {
-        //     //     rejectUnauthorized: true,
-        //     //     ca: [rdsCa]
-        //     // }
-            ssl: true
+            ssl: {
+                rejectUnauthorized: true,
+                ca: [rdsCa]
+            }
+            // ssl: true
         }
     })
 
