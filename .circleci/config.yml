@@ -31,6 +31,10 @@ jobs: # a collection of steps
           command: |
             sudo apt-get -y -qq install awscli
             aws --version
+      - run: 
+          name: Download CA CERTIFICATE
+          command: |
+            curl https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem
       - run:
           name: Zip JAR File
           command: |
