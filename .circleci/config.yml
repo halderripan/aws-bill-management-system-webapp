@@ -66,6 +66,11 @@ jobs: # a collection of steps
       - run:
           name: install-npm-wee
           command: npm install
+      
+      - run: 
+          name: Download CA CERTIFICATE
+          command: |
+            curl -o /home/circleci/rds-combined-ca-bundle.pem https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem
 
       - save_cache: # special step to save the dependency cache
           key: dependency-cache-{{ checksum "package-lock.json" }}
